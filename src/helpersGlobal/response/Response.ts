@@ -1,4 +1,7 @@
-import { ResponseSuccsesfully, Result } from './registragion.interface';
+import {
+  ResponseSuccsesfully,
+  Result,
+} from '../../authentication/interface/auth.interface';
 
 export class RegistrationResponse {
   static succsessfully(obj: Result): ResponseSuccsesfully {

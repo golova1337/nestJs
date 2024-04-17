@@ -1,7 +1,9 @@
+import { userRoles } from 'src/enum/userRoles.enum';
+
 export interface Result {
   massage: string;
   id: string;
-  email: string;
+  email?: string;
   meta: object;
 }
 
@@ -21,18 +23,11 @@ export interface ResponseUnsuccsesfully {
 }
 
 export interface JwtPayload {
-  email: string;
   id: string;
+  role: userRoles;
 }
 
 export interface Login {
   email: string;
   password: string;
-  user: {
-    id: string;
-    email: string;
-    password: string;
-    tokens: { tokens: string; signedAt: string }[];
-    __v: number;
-  };
 }

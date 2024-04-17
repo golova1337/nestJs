@@ -1,10 +1,11 @@
-import { Module } from '@nestjs/common';
+import { Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { RegistrationModule } from './registration/registration.module';
+import { AuthModule } from './authentication/auth.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
+import { APP_PIPE } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -12,15 +13,22 @@ import { ConfigModule } from '@nestjs/config';
       envFilePath: '.env',
       isGlobal: true,
     }),
-    MongooseModule.forRoot(process.env.URL),
-    RegistrationModule,
+    MongooseModule.forRoot(process.env.URL, {
+      minPoolSize: 3,
+      maxPoolSize: 10,
+    }),
+    AuthModule,
     JwtModule.register({
       global: true,
-      secret: process.env.SECRETE_KEY,
-      signOptions: { expiresIn: '1h', algorithm: 'HS256' },
     }),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_PIPE,
+      useClass: ValidationPipe,
+    },
+  ],
 })
 export class AppModule {}
