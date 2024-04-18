@@ -50,10 +50,11 @@ export class AuthService {
     // check user in DB
     const user = await this.authRepository.findOne(data.email).catch((err) => {
       this.logger.error(err);
-      return null;
+      throw new InternalServerErrorException('Internal Servers');
     });
 
     //compare password
+
     if (!user || !compareSync(data.password, user.password)) {
       throw new BadRequestException('Incorrect password or email');
     }
@@ -102,22 +103,33 @@ export class AuthService {
   }
 
   //refresh
-  async refreshTokens(userId: string, refreshToken: string) {
+  async refreshTokens(userId: string, refreshTokenOld: string) {
     //get user
     const user = await this.authRepository.findById(userId);
     if (!user || !user.token) throw new ForbiddenException('Access Denied');
 
     //compare refresh token
 
-    const refreshTokenMatches = await compare(refreshToken, user.token);
+    const refreshTokenMatches = await compare(refreshTokenOld, user.token);
 
     if (!refreshTokenMatches) throw new ForbiddenException('Access Denied');
 
     //get new refresh token
-    const tokens = await this.tokenService.getTokens(user.id, user.username);
+    const { accessToken, refreshToken } = await this.tokenService.getTokens(
+      user.id,
+      user.username,
+    );
 
     //update refresh token DB
-    await this.authRepository.updateRefreshToken(user.id, tokens.refreshToken);
-    return tokens;
+    await this.authRepository.updateRefreshToken(user.id, refreshToken);
+    return {
+      massage: 'Refresh Successfully',
+      id: userId,
+      email: user.email,
+      meta: {
+        accessToken,
+        refreshToken,
+      },
+    };
   }
 }

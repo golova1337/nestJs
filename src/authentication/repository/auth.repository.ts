@@ -22,11 +22,14 @@ export class AuthRepository {
 
   async updateRefreshToken(id, refreshToken) {
     const hashedRefreshToken = await hash(refreshToken, 10);
+    const currentDate = new Date();
 
+    const futureDate = new Date(currentDate);
     await this.userModel.findByIdAndUpdate(
       { _id: id },
       {
         token: hashedRefreshToken,
+        expiresIn: futureDate.setDate(currentDate.getDate() + 7),
       },
     );
   }

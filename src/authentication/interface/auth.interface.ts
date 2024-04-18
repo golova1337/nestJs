@@ -1,5 +1,3 @@
-import { userRoles } from 'src/enum/userRoles.enum';
-
 export interface Result {
   massage: string;
   id: string;
@@ -18,16 +16,6 @@ export interface ResponseSuccsesfully {
 export interface ResponseUnsuccsesfully {
   status: boolean;
   message: string;
-  data: null;
+  meta: null;
   error: string;
-}
-
-export interface JwtPayload {
-  id: string;
-  role: userRoles;
-}
-
-export interface Login {
-  email: string;
-  password: string;
 }

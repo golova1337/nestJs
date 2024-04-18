@@ -9,6 +9,7 @@ import { AccessTokenStrategy } from './strategies/accessToken.strategy';
 import { RefreshTokenStrategy } from './strategies/refreshToken.strategy';
 import { IsEmailExistConstraint } from './decorators/isEmailExist';
 import { TokenService } from './services/token.servise';
+import { RolesGuard } from 'src/roles/roles.guard';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { TokenService } from './services/token.servise';
     AuthRepository,
     AccessTokenStrategy,
     RefreshTokenStrategy,
+    RolesGuard,
     IsEmailUniqueConstraint,
     IsEmailExistConstraint,
   ],

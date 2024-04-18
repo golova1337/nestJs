@@ -14,12 +14,4 @@ export class RegistrationResponse {
       error: false,
     };
   }
-  static unsuccessfully(error) {
-    return {
-      status: false,
-      message: error.message,
-      data: null,
-      error: error.code,
-    };
-  }
 }

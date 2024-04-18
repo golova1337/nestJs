@@ -1,6 +1,4 @@
 import { Module, ValidationPipe } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { AuthModule } from './authentication/auth.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { JwtModule } from '@nestjs/jwt';
@@ -17,14 +15,13 @@ import { APP_PIPE } from '@nestjs/core';
       minPoolSize: 3,
       maxPoolSize: 10,
     }),
-    AuthModule,
     JwtModule.register({
       global: true,
     }),
+    AuthModule,
   ],
-  controllers: [AppController],
+  controllers: [],
   providers: [
-    AppService,
     {
       provide: APP_PIPE,
       useClass: ValidationPipe,
