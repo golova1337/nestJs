@@ -3,18 +3,18 @@ import {
   ForbiddenException,
   Injectable,
   InternalServerErrorException,
-  Logger,
 } from '@nestjs/common';
-import { RegistrationhDto } from '../dto/auth.dto';
+import { RegistrationhDto } from '../dto/auth-dto';
 import { AuthRepository } from '../repository/auth.repository';
-import { Result } from '../interface/auth.interface';
+import { Result } from '../interface/auth-interface';
 import { compare, compareSync, hash } from 'bcryptjs';
 import { TokenService } from './token.servise';
-import { LoginDto } from '../dto/login.dto';
+import { LoginDto } from '../dto/login-dto';
+import { EmojiLogger } from 'src/utils/logger/LoggerService';
 
 @Injectable()
 export class AuthService {
-  private readonly logger = new Logger(AuthService.name);
+  private readonly logger = new EmojiLogger();
   constructor(
     private authRepository: AuthRepository,
     private tokenService: TokenService,
@@ -33,7 +33,7 @@ export class AuthService {
       })
       .catch((err) => {
         this.logger.error(err);
-        return null;
+        throw new InternalServerErrorException('Internal Servers');
       });
 
     //return
@@ -88,13 +88,13 @@ export class AuthService {
   }
 
   //logout
-  async logout(userId) {
-    await this.authRepository.logout(userId);
+  async logout(id: string) {
+    await this.authRepository.logout(id);
 
     //   //return
     return {
       massage: 'Logout Successfully',
-      id: userId,
+      id: id,
       meta: {
         accessToken: null,
         refreshToken: null,

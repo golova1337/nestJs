@@ -8,7 +8,7 @@ import { Injectable } from '@nestjs/common';
 export class AuthRepository {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
-  async save(dto): Promise<any> {
+  async save(dto: { email: string; password: string }): Promise<any> {
     const createdUser = new this.userModel(dto);
     return await createdUser.save();
   }
@@ -20,7 +20,7 @@ export class AuthRepository {
     return this.userModel.findById({ _id: userId }).exec();
   }
 
-  async updateRefreshToken(id, refreshToken) {
+  async updateRefreshToken(id, refreshToken): Promise<any> {
     const hashedRefreshToken = await hash(refreshToken, 10);
     const currentDate = new Date();
 
@@ -34,7 +34,10 @@ export class AuthRepository {
     );
   }
 
-  async logout(userId) {
-    await this.userModel.findByIdAndUpdate({ _id: userId }, { token: null });
+  async logout(id: string): Promise<any> {
+    await this.userModel.findByIdAndUpdate(id, {
+      token: null,
+      expiresIn: null,
+    });
   }
 }

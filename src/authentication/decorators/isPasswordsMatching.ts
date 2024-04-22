@@ -4,7 +4,7 @@ import {
   ValidatorConstraintInterface,
   ValidationArguments,
 } from 'class-validator';
-import { RegistrationhDto } from '../dto/auth.dto';
+import { RegistrationhDto } from '../dto/auth-dto';
 
 @ValidatorConstraint({ name: 'isPasswordsMatching', async: false })
 @Injectable()

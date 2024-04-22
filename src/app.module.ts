@@ -4,6 +4,10 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
 import { APP_PIPE } from '@nestjs/core';
+import { ProjectModule } from './project/project.module';
+import { AccessTokenStrategy } from './utils/strategies/accessToken.strategy';
+import { RefreshTokenStrategy } from './utils/strategies/refreshToken.strategy';
+import { RolesGuard } from './utils/roles/roles.guard';
 
 @Module({
   imports: [
@@ -19,9 +23,13 @@ import { APP_PIPE } from '@nestjs/core';
       global: true,
     }),
     AuthModule,
+    ProjectModule,
   ],
   controllers: [],
   providers: [
+    AccessTokenStrategy,
+    RefreshTokenStrategy,
+    RolesGuard,
     {
       provide: APP_PIPE,
       useClass: ValidationPipe,

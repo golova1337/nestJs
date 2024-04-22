@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { userRoles } from 'src/authentication/enum/userRoles.enum';
+import { userRoles } from 'src/authentication/enum/user-roles-enum';
 
 export type UserDocument = User & Document;
 
@@ -24,8 +24,8 @@ export class User {
   @Prop({ unique: true, default: null })
   token: string | null;
 
-  @Prop()
-  expiresIn: Date;
+  @Prop({ default: null })
+  expiresIn: Date | null;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
