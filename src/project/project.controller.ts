@@ -18,14 +18,18 @@ import { Request } from 'express';
 import { AccessTokenGuard } from 'src/utils/common/accessToken.guard';
 import { Response } from '../helpers/response/Response';
 import { responseSuccesfully } from 'src/helpers/types/response-type';
+import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 
-@Controller('projects')
+@ApiBearerAuth()
+@ApiTags('projects')
+@Controller('v1/api/projects')
 export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
 
   @Roles('user')
   @UseGuards(AccessTokenGuard, RolesGuard)
   @Post()
+  @ApiBody({ type: CreateProjectDto })
   async create(
     @Body() createProjectDto: CreateProjectDto,
     @Req() req: Request,
@@ -33,10 +37,12 @@ export class ProjectController {
     const userId = req.user['id'];
 
     // run service
-    const result = await this.projectService.create({
-      ...createProjectDto,
+    const result = await this.projectService.create(
+      {
+        ...createProjectDto,
+      },
       userId,
-    });
+    );
 
     //create response
     return Response.succsessfully(result);
@@ -71,6 +77,7 @@ export class ProjectController {
   @Roles('user')
   @UseGuards(AccessTokenGuard, RolesGuard)
   @Patch(':id')
+  @ApiBody({ type: UpdateProjectDto })
   async update(
     @Param('id') id: string,
     @Body() updateProjectDto: UpdateProjectDto,

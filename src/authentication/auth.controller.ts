@@ -18,14 +18,23 @@ import { RefreshTokenGuard } from 'src/utils/common/refreshToken.guard';
 import { Roles } from 'src/utils/roles/roles.decorator';
 import { RolesGuard } from 'src/utils/roles/roles.guard';
 import { responseSuccesfully } from '../helpers/types/response-type';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiCreatedResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
-@Controller()
+@ApiTags('Auth')
+@Controller('v1/api/')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   //singup
   @Post('/singUp')
   @HttpCode(201)
+  @ApiBody({ type: RegistrationhDto })
+  @ApiCreatedResponse({ description: 'ok' })
   async singUp(@Body() user: RegistrationhDto): Promise<responseSuccesfully> {
     // run the service
     const result: Result = await this.authService.singUp(user);
@@ -36,6 +45,7 @@ export class AuthController {
   //login
   @Get('login')
   @HttpCode(200)
+  @ApiBody({ type: LoginDto })
   async login(@Body() user: LoginDto): Promise<responseSuccesfully> {
     // run the service
     const result: Result = await this.authService.login(user);
@@ -57,6 +67,7 @@ export class AuthController {
   }
 
   //refresh
+  @ApiBearerAuth()
   @Roles('user')
   @UseGuards(RefreshTokenGuard, RolesGuard)
   @HttpCode(200)

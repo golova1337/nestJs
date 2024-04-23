@@ -9,12 +9,12 @@ services:
     ports:
       - '27017:27017'
     environment:
-      MONGO_INITDB_SCRIPT: .src/_volumes/mongo-init/mongo-init.js
+      MONGO_INITDB_SCRIPT: ./src/_volumes/mongo-init/mongo-init.js
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
     volumes:
       - .:/src
-      - .src/_volumes/mongo-init/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      - ./src/_volumes/mongo-init/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
   mongo-express:
     image: mongo-express
     restart: always

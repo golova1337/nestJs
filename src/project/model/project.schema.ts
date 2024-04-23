@@ -25,7 +25,7 @@ export class Project {
   updateAt: Date;
 
   @Prop({
-    enum: ['ToDo', 'InProgress', 'Done', 'Deleted'],
+    enum: Status,
     default: Status.ToDo,
   })
   status: Status;

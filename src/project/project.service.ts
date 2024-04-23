@@ -17,10 +17,10 @@ export class ProjectService {
 
   constructor(private projectRepository: ProjectRepository) {}
 
-  async create(data: CreateProjectDto) {
+  async create(data: CreateProjectDto, userId: string) {
     // check-Duplicate-Projects
     const projects = await this.projectRepository
-      .checkProjectName(data.userId)
+      .checkProjectName(userId)
       .catch((err) => {
         this.logger.error(err);
         throw new InternalServerErrorException('Internal Servers');
@@ -45,7 +45,7 @@ export class ProjectService {
 
     return {
       massage: 'Create projects Successfully',
-      id: data.userId,
+      id: userId,
       meta: {
         project: {
           id: newProject._id,
