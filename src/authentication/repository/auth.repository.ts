@@ -35,9 +35,12 @@ export class AuthRepository {
   }
 
   async logout(id: string): Promise<any> {
-    await this.userModel.findByIdAndUpdate(id, {
-      token: null,
-      expiresIn: null,
-    });
+    return await this.userModel.findByIdAndUpdate(
+      id,
+      {
+        $unset: { token: 1, expiresIn: 1 },
+      },
+      { new: true },
+    );
   }
 }

@@ -45,9 +45,9 @@ export class AuthController {
   }
 
   // logout
-  @Get('logout')
-  @HttpCode(200)
   @UseGuards(AccessTokenGuard)
+  @HttpCode(200)
+  @Get('logout')
   async logout(@Req() req: Request): Promise<responseSuccesfully> {
     // run the service
     const result: Result = await this.authService.logout(req.user['id']);
@@ -59,13 +59,17 @@ export class AuthController {
   //refresh
   @Roles('user')
   @UseGuards(RefreshTokenGuard, RolesGuard)
+  @HttpCode(200)
   @Get('refresh')
   async refreshTokens(@Req() req: Request): Promise<responseSuccesfully> {
     const userId = req.user['id'];
 
     const refreshToken = req.user['refreshToken'];
 
-    const result: Result = await this.authService.refreshTokens(userId, refreshToken);
+    const result: Result = await this.authService.refreshTokens(
+      userId,
+      refreshToken,
+    );
 
     //create response
     return Response.succsessfully(result);
