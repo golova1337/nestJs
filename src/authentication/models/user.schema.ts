@@ -21,11 +21,8 @@ export class User {
   @Prop({ enum: userRoles, default: userRoles.User })
   role: userRoles;
 
-  @Prop({ unique: true })
-  token: string;
-
-  @Prop()
-  expiresIn: Date;
+  @Prop({ type: { token: String, expiresIn: Date } })
+  RefreshToken: { token: string; expiresIn: Date };
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

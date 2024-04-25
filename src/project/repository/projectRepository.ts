@@ -16,8 +16,8 @@ export class ProjectRepository {
     return await newProject.save();
   }
 
-  async checkProjectName(userId: string) {
-    return await this.projectModel.find({ userId: userId });
+  async findByIdAndTitle(userId: string, title: string) {
+    return await this.projectModel.find({ userId: userId, title: title });
   }
 
   async findAll(data): Promise<CreateProjectDto[]> {

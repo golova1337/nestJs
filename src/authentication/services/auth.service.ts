@@ -96,10 +96,9 @@ export class AuthService {
     return {
       massage: 'Logout Successfully',
       id: id,
-      meta: {
-        accessToken: null,
-        refreshToken: null,
-      },
+      accessToken: null,
+      refreshToken: null,
+      meta: {},
     };
   }
 
@@ -107,18 +106,22 @@ export class AuthService {
   async refreshTokens(userId: string, refreshTokenOld: string) {
     //get user
     const user = await this.authRepository.findById(userId);
-    if (!user || !user.token) throw new ForbiddenException('Access Denied');
+    if (!user || !user.RefreshToken.token)
+      throw new ForbiddenException('Access Denied');
 
     //compare refresh token
 
-    const refreshTokenMatches = await compare(refreshTokenOld, user.token);
+    const refreshTokenMatches = await compare(
+      refreshTokenOld,
+      user.RefreshToken.token,
+    );
 
     if (!refreshTokenMatches) throw new ForbiddenException('Access Denied');
 
     //get new refresh token
     const { accessToken, refreshToken } = await this.tokenService.getTokens(
       user.id,
-      user.username,
+      user.role,
     );
 
     //update refresh token DB
@@ -127,10 +130,9 @@ export class AuthService {
       massage: 'Refresh Successfully',
       id: userId,
       email: user.email,
-      meta: {
-        accessToken,
-        refreshToken,
-      },
+      accessToken,
+      refreshToken,
+      meta: {},
     };
   }
 }

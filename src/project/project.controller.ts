@@ -9,26 +9,25 @@ import {
   Delete,
   UseGuards,
 } from '@nestjs/common';
-import { ProjectService } from './project.service';
+import { ProjectService } from './services/project.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
-import { Roles } from 'src/utils/roles/roles.decorator';
-import { RolesGuard } from 'src/utils/roles/roles.guard';
+import { Roles } from 'src/utils/common/guard/roles/roles.decorator';
 import { Request } from 'express';
-import { AccessTokenGuard } from 'src/utils/common/accessToken.guard';
 import { Response } from '../helpers/response/Response';
 import { responseSuccesfully } from 'src/helpers/types/response-type';
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
+import { RolesGuard } from 'src/utils/common/guard/roles/roles.guard';
 
 @ApiBearerAuth()
 @ApiTags('projects')
+@UseGuards(RolesGuard)
 @Controller('v1/api/projects')
 export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
 
-  @Roles('user')
-  @UseGuards(AccessTokenGuard, RolesGuard)
   @Post()
+  @Roles('user')
   @ApiBody({ type: CreateProjectDto })
   async create(
     @Body() createProjectDto: CreateProjectDto,
@@ -48,9 +47,8 @@ export class ProjectController {
     return Response.succsessfully(result);
   }
 
-  @Roles('user')
-  @UseGuards(AccessTokenGuard, RolesGuard)
   @Get()
+  @Roles('user')
   async findAll(@Req() req: Request): Promise<responseSuccesfully> {
     const query = req.query;
     const userId = req.user['id'];
@@ -63,9 +61,8 @@ export class ProjectController {
     return Response.succsessfully(result);
   }
 
-  @Roles('user')
-  @UseGuards(AccessTokenGuard, RolesGuard)
   @Get(':id')
+  @Roles('user')
   async findOne(@Param('id') id: string): Promise<responseSuccesfully> {
     // run service
     const result = await this.projectService.findOne(id);
@@ -74,9 +71,8 @@ export class ProjectController {
     return Response.succsessfully(result);
   }
 
-  @Roles('user')
-  @UseGuards(AccessTokenGuard, RolesGuard)
   @Patch(':id')
+  @Roles('user')
   @ApiBody({ type: UpdateProjectDto })
   async update(
     @Param('id') id: string,
@@ -89,9 +85,8 @@ export class ProjectController {
     return Response.succsessfully(result);
   }
 
-  @Roles('user')
-  @UseGuards(AccessTokenGuard, RolesGuard)
   @Delete('/delete')
+  @Roles('user')
   async remove(
     @Body('ids') ids: string[],
     @Req() req: Request,

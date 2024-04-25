@@ -12,11 +12,10 @@ import { AuthService } from './services/auth.service';
 import { Response } from '../helpers/response/Response';
 import { Result } from './interface/auth-interface';
 import { LoginDto } from './dto/login-dto';
-import { AccessTokenGuard } from 'src/utils/common/accessToken.guard';
 import { Request } from 'express';
-import { RefreshTokenGuard } from 'src/utils/common/refreshToken.guard';
-import { Roles } from 'src/utils/roles/roles.decorator';
-import { RolesGuard } from 'src/utils/roles/roles.guard';
+import { RefreshTokenGuard } from 'src/utils/common/guard/jwt/refreshToken.guard';
+import { Roles } from 'src/utils/common/guard/roles/roles.decorator';
+import { RolesGuard } from 'src/utils/common/guard/roles/roles.guard';
 import { responseSuccesfully } from '../helpers/types/response-type';
 import {
   ApiBearerAuth,
@@ -24,6 +23,7 @@ import {
   ApiCreatedResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { Public } from 'src/utils/common/guard/public.decorator';
 
 @ApiTags('Auth')
 @Controller('v1/api/')
@@ -32,6 +32,7 @@ export class AuthController {
 
   //singup
   @Post('/singUp')
+  @Public()
   @HttpCode(201)
   @ApiBody({ type: RegistrationhDto })
   @ApiCreatedResponse({ description: 'ok' })
@@ -44,6 +45,7 @@ export class AuthController {
 
   //login
   @Get('login')
+  @Public()
   @HttpCode(200)
   @ApiBody({ type: LoginDto })
   async login(@Body() user: LoginDto): Promise<responseSuccesfully> {
@@ -55,9 +57,10 @@ export class AuthController {
   }
 
   // logout
-  @UseGuards(AccessTokenGuard)
-  @HttpCode(200)
   @Get('logout')
+  @Roles('user')
+  @HttpCode(200)
+  @UseGuards(RolesGuard)
   async logout(@Req() req: Request): Promise<responseSuccesfully> {
     // run the service
     const result: Result = await this.authService.logout(req.user['id']);
@@ -67,11 +70,13 @@ export class AuthController {
   }
 
   //refresh
-  @ApiBearerAuth()
+
+  @Get('refresh')
+  @Public()
   @Roles('user')
   @UseGuards(RefreshTokenGuard, RolesGuard)
   @HttpCode(200)
-  @Get('refresh')
+  @ApiBearerAuth()
   async refreshTokens(@Req() req: Request): Promise<responseSuccesfully> {
     const userId = req.user['id'];
 

@@ -4,12 +4,11 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateProjectDto } from './dto/create-project.dto';
-import { UpdateProjectDto } from './dto/update-project.dto';
-import { ProjectRepository } from './repository/projectRepository';
-import { duplicateName } from './helpers/checkProjectName';
+import { CreateProjectDto } from '../dto/create-project.dto';
+import { UpdateProjectDto } from '../dto/update-project.dto';
+import { ProjectRepository } from '../repository/projectRepository';
 import { EmojiLogger } from 'src/utils/logger/LoggerService';
-import { isEmptyObj } from './helpers/isEmptyObj';
+import { isEmptyObj } from '../helpers/isEmptyObj';
 
 @Injectable()
 export class ProjectService {
@@ -20,24 +19,22 @@ export class ProjectService {
   async create(data: CreateProjectDto, userId: string) {
     // check-Duplicate-Projects
     const projects = await this.projectRepository
-      .checkProjectName(userId)
+      .findByIdAndTitle(userId, data.title)
       .catch((err) => {
         this.logger.error(err);
         throw new InternalServerErrorException('Internal Servers');
       });
-    // run helper chek duplicate-sName
-    const result = duplicateName(projects, data.title);
 
-    // check-count-projects
-    if (result.length >= 2) {
+    // check projects
+    if (projects.length != 0) {
       throw new BadRequestException(
-        'You can not have more two projects with the same title',
+        'You can not have  two projects with the same title',
       );
     }
 
     // create-projects
     const newProject = await this.projectRepository
-      .create(data)
+      .create({ ...data, userId })
       .catch((err) => {
         this.logger.error(err);
         throw new InternalServerErrorException('Internal Servers');
@@ -46,14 +43,13 @@ export class ProjectService {
     return {
       massage: 'Create projects Successfully',
       id: userId,
-      meta: {
-        project: {
-          id: newProject._id,
-          title: newProject.title,
-          description: newProject.description,
-          status: newProject.status,
-        },
+      project: {
+        id: newProject._id,
+        title: newProject.title,
+        description: newProject.description,
+        status: newProject.status,
       },
+      meta: {},
     };
   }
 
@@ -84,8 +80,8 @@ export class ProjectService {
     return {
       massage: 'Get projects Successfully',
       id: userId,
+      projects,
       meta: {
-        projects,
         page,
         perPage,
       },
@@ -101,9 +97,8 @@ export class ProjectService {
     //return response
     return {
       message: 'Get one by id succesfully',
-      meta: {
-        project: project,
-      },
+      project,
+      meta: {},
     };
   }
 
@@ -114,23 +109,20 @@ export class ProjectService {
     //return response
     return {
       message: 'Update by id succesfully',
-      meta: {
-        project: update,
-      },
+      project: update,
+      meta: {},
     };
   }
 
   async remove(userId: string, ids: string[]) {
     const deleted = await this.projectRepository.remove(ids);
-    console.log(deleted);
 
     return {
       message: 'Deleted succesfully',
       id: userId,
-      meta: {
-        removed: deleted.deletedCount,
-        ids_projects: ids,
-      },
+      removed: deleted.deletedCount,
+      ids_projects: ids,
+      meta: {},
     };
   }
 }
