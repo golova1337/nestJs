@@ -33,6 +33,7 @@ export class ProjectService {
     }
 
     // create-projects
+
     const newProject = await this.projectRepository
       .create({ ...data, userId })
       .catch((err) => {
@@ -43,12 +44,7 @@ export class ProjectService {
     return {
       massage: 'Create projects Successfully',
       id: userId,
-      project: {
-        id: newProject._id,
-        title: newProject.title,
-        description: newProject.description,
-        status: newProject.status,
-      },
+      newProject,
       meta: {},
     };
   }

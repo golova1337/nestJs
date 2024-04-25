@@ -13,6 +13,7 @@ export class ProjectRepository {
 
   async create(data) {
     const newProject = new this.projectModel(data);
+
     return await newProject.save();
   }
 

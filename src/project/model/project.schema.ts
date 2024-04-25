@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
 import { Status } from '../enum/status-project-enum';
+import { Task, TaskSchema } from './task.schema';
 
 export type ProjectDocument = Project & Document;
 
@@ -15,20 +16,24 @@ export class Project {
   @Prop({ type: String })
   description: string;
 
-  @Prop({ type: [{ name: String, description: String }] })
-  task: [{ name: string; description: string }];
+  @Prop({ type: [TaskSchema] })
+  task: Task[];
 
   @Prop({ default: Date.now }) // Устанавливаем значение по умолчанию на текущую дату и время
   createdAt: Date;
 
   @Prop({ type: Date, default: Date.now })
-  updateAt: Date;
+  updatedAt: Date;
 
   @Prop({
+    type: String,
     enum: Status,
     default: Status.ToDo,
   })
   status: Status;
+
+  @Prop({ type: [String], ref: 'User' })
+  colaboration: string[];
 }
 
 export const ProjectSchema = SchemaFactory.createForClass(Project);

@@ -3,17 +3,18 @@ import { CreateProjectDto } from './create-project.dto';
 import { IsOptional } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Status } from '../enum/status-project-enum';
+import { Task } from '../model/task.schema';
 
 export class UpdateProjectDto extends PartialType(CreateProjectDto) {
   @ApiProperty({ type: String, example: 'ToDoList' })
   @ApiPropertyOptional()
   @IsOptional()
-  title: string;
+  title?: string;
 
   @ApiProperty({ type: String, example: 'your description' })
   @ApiPropertyOptional()
   @IsOptional()
-  description: string;
+  description?: string;
 
   @ApiProperty({
     description: 'Array of objects with name and description properties',
@@ -21,7 +22,7 @@ export class UpdateProjectDto extends PartialType(CreateProjectDto) {
   })
   @ApiPropertyOptional()
   @IsOptional()
-  task: { name: string; description: string }[];
+  task?: Task[];
 
   @ApiProperty({
     description: 'Status of the item',
@@ -29,5 +30,6 @@ export class UpdateProjectDto extends PartialType(CreateProjectDto) {
     example: Status.InProgress,
   })
   @ApiPropertyOptional()
-  status: Status;
+  @IsOptional()
+  status?: Status;
 }
