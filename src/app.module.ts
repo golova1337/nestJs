@@ -9,6 +9,7 @@ import { AccessTokenStrategy } from './utils/strategies/accessToken.strategy';
 import { RefreshTokenStrategy } from './utils/strategies/refreshToken.strategy';
 import { RolesGuard } from './utils/common/guard/roles/roles.guard';
 import { AccessTokenGuard } from './utils/common/guard/jwt/accessToken.guard';
+import { MailerModule } from '@nestjs-modules/mailer';
 
 @Module({
   imports: [
@@ -22,6 +23,17 @@ import { AccessTokenGuard } from './utils/common/guard/jwt/accessToken.guard';
     }),
     JwtModule.register({
       global: true,
+    }),
+    MailerModule.forRoot({
+      transport: {
+        host: process.env.EMAIL_HOST,
+        port: 587,
+        secure: false, // Use `true` for port 465, `false` for all other ports
+        auth: {
+          user: process.env.EMAIL_USERNAME,
+          pass: process.env.EMAIL_PASSWORD,
+        },
+      },
     }),
     AuthModule,
     ProjectModule,

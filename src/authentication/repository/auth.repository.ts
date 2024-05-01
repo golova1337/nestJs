@@ -42,4 +42,8 @@ export class AuthRepository {
       { new: true },
     );
   }
+
+  async findByEmail(emails: string[]): Promise<any> {
+    return await this.userModel.find({ email: { $in: emails } });
+  }
 }

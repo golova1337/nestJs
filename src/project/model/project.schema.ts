@@ -5,7 +5,14 @@ import { Task, TaskSchema } from './task.schema';
 
 export type ProjectDocument = Project & Document;
 
-@Schema()
+@Schema({
+  toJSON: {
+    getters: true,
+    virtuals: true,
+  },
+  timestamps: true,
+  validateBeforeSave: true,
+})
 export class Project {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
   userId: string;
@@ -14,26 +21,20 @@ export class Project {
   title: string;
 
   @Prop({ type: String })
-  description: string;
+  description?: string;
 
   @Prop({ type: [TaskSchema] })
-  task: Task[];
-
-  @Prop({ default: Date.now }) // Устанавливаем значение по умолчанию на текущую дату и время
-  createdAt: Date;
-
-  @Prop({ type: Date, default: Date.now })
-  updatedAt: Date;
+  task?: Task[];
 
   @Prop({
     type: String,
     enum: Status,
     default: Status.ToDo,
   })
-  status: Status;
+  status?: Status;
 
-  @Prop({ type: [String], ref: 'User' })
-  colaboration: string[];
+  @Prop({ type: [String] })
+  colaboration?: string[];
 }
 
 export const ProjectSchema = SchemaFactory.createForClass(Project);

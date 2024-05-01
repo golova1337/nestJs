@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Project, ProjectDocument } from '../model/project.schema';
 import { Model } from 'mongoose';
-import { CreateProjectDto } from '../dto/create-project.dto';
 import { UpdateProjectDto } from '../dto/update-project.dto';
 
 @Injectable()
@@ -11,7 +10,7 @@ export class ProjectRepository {
     @InjectModel(Project.name) private projectModel: Model<ProjectDocument>,
   ) {}
 
-  async create(data) {
+  async create(data: Project): Promise<Project> {
     const newProject = new this.projectModel(data);
 
     return await newProject.save();
@@ -21,27 +20,25 @@ export class ProjectRepository {
     return await this.projectModel.find({ userId: userId, title: title });
   }
 
-  async findAll(data): Promise<CreateProjectDto[]> {
+  async findAll(data): Promise<Project[]> {
+    //destructurisation
+    const { pagin, sorting, filters } = data;
     return await this.projectModel
-      .find({ userId: data.userId, ...data.filters })
-      .sort(data.sortQuery)
-      .skip((data.page - 1) * data.perPage)
-      .limit(data.perPage);
+      .find({ ...filters })
+      .sort(sorting)
+      .skip((pagin.page - 1) * data.perPage)
+      .limit(pagin.perPage);
   }
 
-  async findOne(id: string): Promise<CreateProjectDto> {
+  async findOne(id: string): Promise<Project> {
     return await this.projectModel.findById(id);
   }
 
-  async update(
-    id: string,
-    updateProjectDto: UpdateProjectDto,
-  ): Promise<CreateProjectDto> {
+  async update(id: string, update: UpdateProjectDto): Promise<Project> {
     return await this.projectModel.findByIdAndUpdate(
       id,
       {
-        ...updateProjectDto,
-        updateAt: Date.now(),
+        ...update,
       },
       { new: true },
     );
@@ -49,5 +46,15 @@ export class ProjectRepository {
 
   async remove(ids: string[]) {
     return await this.projectModel.deleteMany({ _id: { $in: ids } });
+  }
+
+  async addCollaborate(projectId: string, collaborator: string): Promise<any> {
+    return await this.projectModel.findByIdAndUpdate(
+      { _id: projectId },
+      {
+        $push: { colaboration: collaborator },
+      },
+      { new: true },
+    );
   }
 }

@@ -18,6 +18,7 @@ import { Response } from '../helpers/response/Response';
 import { responseSuccesfully } from 'src/helpers/types/response-type';
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import { RolesGuard } from 'src/utils/common/guard/roles/roles.guard';
+import { AccessProjectDto } from './dto/access-project.dto';
 
 @ApiBearerAuth()
 @ApiTags('projects')
@@ -50,6 +51,7 @@ export class ProjectController {
   @Get()
   @Roles('user')
   async findAll(@Req() req: Request): Promise<responseSuccesfully> {
+    // get condition
     const query = req.query;
     const userId = req.user['id'];
     const condition = { ...query, userId };
@@ -97,6 +99,30 @@ export class ProjectController {
     const result = await this.projectService.remove(userId, ids);
 
     //create response
+    return Response.succsessfully(result);
+  }
+
+  @Post(':projectId/access')
+  @Roles('user')
+  async access(
+    @Body() collaborators: AccessProjectDto,
+    @Param('projectId') projectId: string,
+  ): Promise<responseSuccesfully> {
+    //run service
+    const result = await this.projectService.access(collaborators, projectId);
+    //return reasponse
+    return Response.succsessfully(result);
+  }
+
+  @Get(':projectId/access/:invitationToken')
+  @Roles('user')
+  async gainAccess(
+    @Param() params: { projectId: string; invitationToken: string },
+  ): Promise<responseSuccesfully> {
+    // run service
+    const result = await this.projectService.gainAccess(params);
+
+    //return reasponse
     return Response.succsessfully(result);
   }
 }
