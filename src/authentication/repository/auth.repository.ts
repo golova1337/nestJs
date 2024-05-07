@@ -1,5 +1,5 @@
 import { InjectModel } from '@nestjs/mongoose';
-import { User, UserDocument } from '../models/user.schema';
+import { User, UserDocument } from '../entities/user.entities';
 import { Model } from 'mongoose';
 import { hash } from 'bcryptjs';
 import { Injectable } from '@nestjs/common';
@@ -16,11 +16,11 @@ export class AuthRepository {
   async findOne(email: string): Promise<any> {
     return this.userModel.findOne({ email: email }).exec();
   }
-  async findById(userId): Promise<any> {
+  async findById(userId: string): Promise<any> {
     return this.userModel.findById({ _id: userId }).exec();
   }
 
-  async updateRefreshToken(id, refreshToken): Promise<any> {
+  async updateRefreshToken(id: string, refreshToken: string): Promise<any> {
     const hashedRefreshToken = await hash(refreshToken, 10);
     await this.userModel.findByIdAndUpdate(
       { _id: id },

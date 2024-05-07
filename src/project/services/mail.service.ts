@@ -11,15 +11,15 @@ export class MailService {
     private configService: ConfigService,
   ) {}
 
-  async sendMail(data, subject: string) {
+  async sendMail(invitations) {
     await Promise.all(
-      data.map(async (collaborate) => {
+      invitations.map(async (invitation) => {
         await this.mailService
           .sendMail({
             from: `Providenci Kassulke <${this.configService.get<string>('EMAIL_USERNAME')}>`,
-            to: collaborate.email,
-            subject: subject,
-            text: ` forward to the link   http://localhost:3000/v1/api/projects/${collaborate.projectId}/access/${collaborate.token}`,
+            to: invitation.email,
+            subject: 'Invitation',
+            text: ` forward to the link   http://localhost:${parseInt(this.configService.get<string>('PORT'), 10) || 3000}/v1/api/projects/${invitation.projectId}/settings/access?invitationToken=${invitation.token}`,
           })
           .catch((err) => {
             this.logger.error(err);

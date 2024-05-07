@@ -9,16 +9,15 @@ import {
   Delete,
   UseGuards,
 } from '@nestjs/common';
-import { ProjectService } from './services/project.service';
-import { CreateProjectDto } from './dto/create-project.dto';
-import { UpdateProjectDto } from './dto/update-project.dto';
+import { ProjectService } from '../services/project.service';
+import { CreateProjectDto } from '../dto/create-project.dto';
+import { UpdateProjectDto } from '../dto/update-project.dto';
 import { Roles } from 'src/utils/common/guard/roles/roles.decorator';
 import { Request } from 'express';
-import { Response } from '../helpers/response/Response';
+import { Response } from '../../helpers/response/Response';
 import { responseSuccesfully } from 'src/helpers/types/response-type';
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import { RolesGuard } from 'src/utils/common/guard/roles/roles.guard';
-import { AccessProjectDto } from './dto/access-project.dto';
 
 @ApiBearerAuth()
 @ApiTags('projects')
@@ -37,12 +36,7 @@ export class ProjectController {
     const userId = req.user['id'];
 
     // run service
-    const result = await this.projectService.create(
-      {
-        ...createProjectDto,
-      },
-      userId,
-    );
+    const result = await this.projectService.create(createProjectDto, userId);
 
     //create response
     return Response.succsessfully(result);
@@ -54,34 +48,45 @@ export class ProjectController {
     // get condition
     const query = req.query;
     const userId = req.user['id'];
-    const condition = { ...query, userId };
 
     // run service
-    const result = await this.projectService.findAll(condition);
+    const result = await this.projectService.findAll({ ...query, userId });
 
     //create response
     return Response.succsessfully(result);
   }
 
-  @Get(':id')
+  @Get(':projectId')
   @Roles('user')
-  async findOne(@Param('id') id: string): Promise<responseSuccesfully> {
+  async findOne(
+    @Param('projectId') projectId: string,
+    @Req() req: Request,
+  ): Promise<responseSuccesfully> {
+    const userId = req.user['id'];
+    console.log();
+
     // run service
-    const result = await this.projectService.findOne(id);
+    const result = await this.projectService.findOne({ userId, projectId });
 
     //create response
     return Response.succsessfully(result);
   }
 
-  @Patch(':id')
+  @Patch(':projectId')
   @Roles('user')
   @ApiBody({ type: UpdateProjectDto })
   async update(
-    @Param('id') id: string,
+    @Req() req: Request,
+    @Param('projectId') id: string,
     @Body() updateProjectDto: UpdateProjectDto,
   ): Promise<responseSuccesfully> {
+    const userId = req.user['id'];
     //run service
-    const result = await this.projectService.update(id, updateProjectDto);
+    const result = await this.projectService.update(
+      userId,
+      id,
+      updateProjectDto,
+    );
 
     //crete reaponse
     return Response.succsessfully(result);
@@ -99,30 +104,6 @@ export class ProjectController {
     const result = await this.projectService.remove(userId, ids);
 
     //create response
-    return Response.succsessfully(result);
-  }
-
-  @Post(':projectId/access')
-  @Roles('user')
-  async access(
-    @Body() collaborators: AccessProjectDto,
-    @Param('projectId') projectId: string,
-  ): Promise<responseSuccesfully> {
-    //run service
-    const result = await this.projectService.access(collaborators, projectId);
-    //return reasponse
-    return Response.succsessfully(result);
-  }
-
-  @Get(':projectId/access/:invitationToken')
-  @Roles('user')
-  async gainAccess(
-    @Param() params: { projectId: string; invitationToken: string },
-  ): Promise<responseSuccesfully> {
-    // run service
-    const result = await this.projectService.gainAccess(params);
-
-    //return reasponse
     return Response.succsessfully(result);
   }
 }

@@ -7,16 +7,16 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { RegistrationhDto } from './dto/auth-dto';
-import { AuthService } from './services/auth.service';
-import { Response } from '../helpers/response/Response';
-import { Result } from './interface/auth-interface';
-import { LoginDto } from './dto/login-dto';
+import { RegistrationhDto } from '../dto/auth-dto';
+import { AuthService } from '../services/auth.service';
+import { Response } from '../../helpers/response/Response';
+import { Result } from '../interface/auth-interface';
+import { LoginDto } from '../dto/login-dto';
 import { Request } from 'express';
 import { RefreshTokenGuard } from 'src/utils/common/guard/jwt/refreshToken.guard';
 import { Roles } from 'src/utils/common/guard/roles/roles.decorator';
 import { RolesGuard } from 'src/utils/common/guard/roles/roles.guard';
-import { responseSuccesfully } from '../helpers/types/response-type';
+import { responseSuccesfully } from 'src/helpers/types/response-type';
 import {
   ApiBearerAuth,
   ApiBody,

@@ -10,5 +10,5 @@ export class AccessProjectDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsEmail({}, { each: true })
-  colaboration: string[];
+  collaboration: string[];
 }

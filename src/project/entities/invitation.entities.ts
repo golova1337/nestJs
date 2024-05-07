@@ -1,5 +1,4 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Colaboration } from '../enum/status-colaboration';
 import mongoose, { Document } from 'mongoose';
 
 export type InvitationDocument = Invitation & Document;
@@ -13,7 +12,7 @@ export type InvitationDocument = Invitation & Document;
   timestamps: true,
 })
 export class Invitation {
-  @Prop({ type: mongoose.Schema.Types.ObjectId })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Project' })
   projectId: string;
 
   @Prop({ type: String })
@@ -21,12 +20,6 @@ export class Invitation {
 
   @Prop({ type: String })
   token: string;
-
-  @Prop({ type: Date, default: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) })
-  expiresIn: Date;
-
-  @Prop({ type: String, default: Colaboration.notYetResponded })
-  status?: Colaboration;
 }
 
 export const InvitationSchema = SchemaFactory.createForClass(Invitation);

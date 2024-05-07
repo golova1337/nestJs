@@ -6,21 +6,20 @@ import {
 } from '@nestjs/common';
 import { CreateProjectDto } from '../dto/create-project.dto';
 import { UpdateProjectDto } from '../dto/update-project.dto';
-import { ProjectRepository } from '../repository/projectRepository';
+import { ProjectRepository } from '../repository/project.repository';
 import { EmojiLogger } from 'src/utils/logger/LoggerService';
 import { isEmptyObj } from '../helpers/isEmptyObj';
-import { SettingProject } from './setting-project.service';
-import { Project } from '../model/project.schema';
+import { SettingsProjectService } from './setting-project.service';
+import { Project } from '../entities/project.entities';
 import { sort } from '../helpers/sortField-Order';
 import { pagination } from '../helpers/pagination ';
-import { AccessProjectDto } from '../dto/access-project.dto';
 
 @Injectable()
 export class ProjectService {
   private readonly logger = new EmojiLogger();
   constructor(
     private readonly projectRepository: ProjectRepository,
-    private readonly settingProject: SettingProject,
+    private readonly settingProject: SettingsProjectService,
   ) {}
 
   async create(data: CreateProjectDto, userId: string): Promise<any> {
@@ -45,11 +44,11 @@ export class ProjectService {
         this.logger.error(err);
         throw new InternalServerErrorException('Internal Server Error');
       });
+    console.log(project);
 
     // return
     return {
       massage: 'Create projects Successfully',
-      id: userId,
       project,
       meta: {},
     };
@@ -59,7 +58,7 @@ export class ProjectService {
     //destructurisation
     let { page, perPage, sortField, sortOrder, ...filters } = condition;
 
-    //condition of sort
+    //condition of sort, field and order ascending, descending
     const sorting = sort(sortField, sortOrder);
     //Pagination
     const pagin = pagination(page, perPage);
@@ -68,10 +67,13 @@ export class ProjectService {
 
     // run repository
     const data = { pagin, sorting, filters };
-    const projects = await this.projectRepository.findAll(data).catch((err) => {
-      this.logger.error(err);
-      throw new InternalServerErrorException('Internal Server Error');
-    });
+
+    const projects: Project[] | [] = await this.projectRepository
+      .findAll(data)
+      .catch((err) => {
+        this.logger.error(err);
+        throw new InternalServerErrorException('Internal Server Error');
+      });
 
     //return
     return {
@@ -88,12 +90,15 @@ export class ProjectService {
     };
   }
 
-  async findOne(id: string): Promise<any> {
+  async findOne(data: { userId: string; projectId: string }): Promise<any> {
     // run repo
-    const project = await this.projectRepository.findOne(id);
+    const project: Project | null = await this.projectRepository
+      .findOne(data)
+      .catch((err) => {
+        this.logger.error(err);
+        throw new InternalServerErrorException('Internal Server Error');
+      });
 
-    // check whether the project exist
-    if (!project) throw new NotFoundException('Project does not exist');
     //return response
     return {
       message: 'Get one by id succesfully',
@@ -102,14 +107,23 @@ export class ProjectService {
     };
   }
 
-  async update(id: string, update: UpdateProjectDto): Promise<any> {
+  async update(
+    userId: string,
+    id: string,
+    update: UpdateProjectDto,
+  ): Promise<any> {
     // run repository
-    const project = await this.projectRepository
-      .update(id, update)
+
+    const project: Project | null = await this.projectRepository
+      .update({ userId, id, update })
       .catch((err) => {
         this.logger.error(err);
         throw new InternalServerErrorException('Internal Server Error');
       });
+
+    if (!project) {
+      throw new NotFoundException('Not Found');
+    }
 
     //return response
     return {
@@ -120,46 +134,16 @@ export class ProjectService {
   }
 
   async remove(userId: string, ids: string[]): Promise<any> {
-    const deleted = await this.projectRepository.remove(ids);
+    const deleted = await this.projectRepository.remove(ids, userId);
+    if (!deleted.deletedCount) {
+      throw new BadRequestException('You do not have access to remove it');
+    }
 
     return {
       message: 'Deleted succesfully',
       id: userId,
       removed: deleted.deletedCount,
       ids_projects: ids,
-      meta: {},
-    };
-  }
-
-  async access(
-    collaborators: AccessProjectDto,
-    projectId: string,
-  ): Promise<any> {
-    // run settingProject service
-    const result = await this.settingProject.access(collaborators, projectId);
-
-    //return
-    return {
-      message: 'Collaborators were invited succesfully',
-      collaborators: collaborators.colaboration,
-      meta: {},
-    };
-  }
-
-  async gainAccess(params: { projectId: string; invitationToken: string }) {
-    // run settingProject service
-    const result = await this.settingProject.gainAccess(params);
-    console.log(result);
-
-    // run project Repository
-    const addCollaborate = await this.projectRepository.addCollaborate(
-      params.projectId,
-      result[0].email,
-    );
-
-    //return
-    return {
-      message: 'You have got access to project',
       meta: {},
     };
   }

@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Invitation, InvitationDocument } from '../model/invitation.schema';
+import {
+  Invitation,
+  InvitationDocument,
+} from '../entities/invitation.entities';
 import { Model } from 'mongoose';
 
 @Injectable()
@@ -19,14 +22,15 @@ export class InvitationRepository {
     }
   }
 
-  async checkToken(projectId: string, invitationToken: string): Promise<any> {
-    return this.invitationModel.find({
+  async findInvitationAndDelete(
+    projectId: string,
+    invitationToken: string,
+  ): Promise<any> {
+    const project = await this.invitationModel.findOneAndDelete({
       projectId: projectId,
       token: invitationToken,
     });
-  }
 
-  async remove(invationToken: string): Promise<any> {
-    return await this.invitationModel.deleteOne({ token: invationToken });
+    return project;
   }
 }

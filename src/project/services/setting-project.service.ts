@@ -8,31 +8,18 @@ import { AuthRepository } from 'src/authentication/repository/auth.repository';
 import { EmojiLogger } from 'src/utils/logger/LoggerService';
 import { AccessProjectDto } from '../dto/access-project.dto';
 import { MailService } from './mail.service';
-import { InvitationRepository } from '../repository/invitationRepository';
+import { InvitationRepository } from '../repository/invitation.repository';
+import { ProjectRepository } from '../repository/project.repository';
 
 @Injectable()
-export class SettingProject {
+export class SettingsProjectService {
   private readonly logger = new EmojiLogger();
   constructor(
     private readonly authRepository: AuthRepository,
     private readonly invitationRepository: InvitationRepository,
+    private readonly projectRepository: ProjectRepository,
     private readonly mailService: MailService,
   ) {}
-
-  private async checkByEmail(colaborators: string[]): Promise<void> {
-    // check colaborators
-    const chekColaborators = await this.authRepository
-      .findByEmail(colaborators)
-      .catch((err) => {
-        this.logger.error(err);
-        throw new InternalServerErrorException();
-      });
-
-    if (colaborators.length != chekColaborators.length) {
-      this.logger.error('You can not invite unregistered users');
-      throw new BadRequestException('Bad Request');
-    }
-  }
 
   private async createInvitationTokens(
     colaborators: string[],
@@ -56,16 +43,23 @@ export class SettingProject {
     return invitations;
   }
 
-  async access(
-    collaborators: AccessProjectDto,
-    projectId: string,
-  ): Promise<void> {
+  async access(collaborators: string[], projectId: string): Promise<any> {
     // chekc collaborators
-    await this.checkByEmail(collaborators.colaboration);
+    const chekColaborators = await this.authRepository
+      .findByEmail(collaborators)
+      .catch((err) => {
+        this.logger.error(err);
+        throw new InternalServerErrorException();
+      });
+
+    if (collaborators.length != chekColaborators.length) {
+      this.logger.error('You can not invite unregistered users');
+      throw new BadRequestException('Bad Request');
+    }
 
     // create invitation
     const createInvitationTokens = await this.createInvitationTokens(
-      collaborators.colaboration,
+      collaborators,
       projectId,
     );
 
@@ -73,33 +67,43 @@ export class SettingProject {
     await this.invitationRepository.create(createInvitationTokens);
 
     // send invitation
-    await this.mailService.sendMail(createInvitationTokens, 'Invitation');
+    await this.mailService.sendMail(createInvitationTokens);
+    // return
+    return {
+      message: 'successful invitation',
+      collaboration: collaborators,
+      meta: {},
+    };
   }
 
-  async gainAccess(params: { projectId: string; invitationToken: string }) {
-    const { projectId, invitationToken } = params;
-    // check token
-    const checkToken = await this.invitationRepository
-      .checkToken(projectId, invitationToken)
+  async gainAccess(data: {
+    projectId: string;
+    invitationToken: string;
+  }): Promise<any> {
+    const { projectId, invitationToken } = data;
+    // find Invitation And Delete
+    const findInvitationAndDelete = await this.invitationRepository
+      .findInvitationAndDelete(projectId, invitationToken)
       .catch((err) => {
         this.logger.error(err);
         throw new InternalServerErrorException('Internal Server Error');
       });
 
-    // check expiresIn
-    const expiresInDate = checkToken.expiresIn;
-    const currentDate = new Date();
-
-    const differenceInMilliseconds =
-      expiresInDate.getTime() - currentDate.getTime();
-
-    const differenceInDays = differenceInMilliseconds / (1000 * 60 * 60 * 24);
-
-    if (!checkToken.length && differenceInDays > 7) {
+    if (!findInvitationAndDelete) {
       throw new BadRequestException('Bad Request');
     }
+    // push into an array collaboration of project
+    const addCollaborate = await this.projectRepository.addCollaborate(
+      projectId,
+      findInvitationAndDelete.email,
+    );
 
-    const removeToken = await this.invitationRepository.remove(invitationToken);
-    return checkToken;
+    return {
+      message: 'successful Collaboration ',
+      project: addCollaborate.title,
+      collaborator:
+        addCollaborate.collaboration[addCollaborate.collaboration.length - 1],
+      meta: {},
+    };
   }
 }

@@ -10,6 +10,7 @@ import { RefreshTokenStrategy } from './utils/strategies/refreshToken.strategy';
 import { RolesGuard } from './utils/common/guard/roles/roles.guard';
 import { AccessTokenGuard } from './utils/common/guard/jwt/accessToken.guard';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { TasksModule } from './tasks/tasks.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
     }),
     AuthModule,
     ProjectModule,
+    TasksModule,
   ],
   controllers: [],
   providers: [

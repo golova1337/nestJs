@@ -3,7 +3,7 @@ import { IsNotEmpty, IsOptional } from 'class-validator';
 export class CreateProjectDto {
   //title
   @ApiProperty({
-    example: 'My project',
+    example: 'My first project',
     description: 'You can not have two projects with the same name',
   })
   @IsNotEmpty()
@@ -11,7 +11,7 @@ export class CreateProjectDto {
 
   //description
   @ApiProperty({
-    example: 'my first project',
+    example: 'It is my first project',
   })
   @ApiPropertyOptional()
   @IsOptional()
