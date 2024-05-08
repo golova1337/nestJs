@@ -6,10 +6,10 @@ import {
 import { v4 } from 'uuid';
 import { AuthRepository } from 'src/authentication/repository/auth.repository';
 import { EmojiLogger } from 'src/utils/logger/LoggerService';
-import { AccessProjectDto } from '../dto/access-project.dto';
-import { MailService } from './mail.service';
 import { InvitationRepository } from '../repository/invitation.repository';
 import { ProjectRepository } from '../repository/project.repository';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
 
 @Injectable()
 export class SettingsProjectService {
@@ -18,7 +18,7 @@ export class SettingsProjectService {
     private readonly authRepository: AuthRepository,
     private readonly invitationRepository: InvitationRepository,
     private readonly projectRepository: ProjectRepository,
-    private readonly mailService: MailService,
+    @InjectQueue('send-mail') private sendQueue: Queue,
   ) {}
 
   private async createInvitationTokens(
@@ -67,7 +67,22 @@ export class SettingsProjectService {
     await this.invitationRepository.create(createInvitationTokens);
 
     // send invitation
-    await this.mailService.sendMail(createInvitationTokens);
+    await this.sendQueue.add(
+      'send mails',
+      { name: createInvitationTokens },
+      {
+        delay: 5000,
+        priority: 1,
+        attempts: 3, //The total number of attempts to try the job until it completes
+        backoff: {
+          //Backoff setting for automatic retries if the job fails.
+          type: 'exponential',
+          delay: 60000,
+        },
+        timeout: 10000, //The number of milliseconds after which the job should fail with a timeout error
+        removeOnComplete: true,
+      },
+    );
     // return
     return {
       message: 'successful invitation',
@@ -76,14 +91,11 @@ export class SettingsProjectService {
     };
   }
 
-  async gainAccess(data: {
-    projectId: string;
-    invitationToken: string;
-  }): Promise<any> {
-    const { projectId, invitationToken } = data;
+  async gainAccess(data: { projectId: string; token: string }): Promise<any> {
+    const { projectId, token } = data;
     // find Invitation And Delete
     const findInvitationAndDelete = await this.invitationRepository
-      .findInvitationAndDelete(projectId, invitationToken)
+      .findInvitationAndDelete(projectId, token)
       .catch((err) => {
         this.logger.error(err);
         throw new InternalServerErrorException('Internal Server Error');

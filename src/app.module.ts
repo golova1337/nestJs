@@ -11,6 +11,7 @@ import { RolesGuard } from './utils/common/guard/roles/roles.guard';
 import { AccessTokenGuard } from './utils/common/guard/jwt/accessToken.guard';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { TasksModule } from './tasks/tasks.module';
+import { BullModule } from '@nestjs/bull';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { TasksModule } from './tasks/tasks.module';
         },
       },
     }),
+    BullModule.forRoot({ redis: { host: 'localhost', port: 6379 } }),
     AuthModule,
     ProjectModule,
     TasksModule,

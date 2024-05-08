@@ -9,7 +9,6 @@ import { UpdateProjectDto } from '../dto/update-project.dto';
 import { ProjectRepository } from '../repository/project.repository';
 import { EmojiLogger } from 'src/utils/logger/LoggerService';
 import { isEmptyObj } from '../helpers/isEmptyObj';
-import { SettingsProjectService } from './setting-project.service';
 import { Project } from '../entities/project.entities';
 import { sort } from '../helpers/sortField-Order';
 import { pagination } from '../helpers/pagination ';
@@ -17,10 +16,7 @@ import { pagination } from '../helpers/pagination ';
 @Injectable()
 export class ProjectService {
   private readonly logger = new EmojiLogger();
-  constructor(
-    private readonly projectRepository: ProjectRepository,
-    private readonly settingProject: SettingsProjectService,
-  ) {}
+  constructor(private readonly projectRepository: ProjectRepository) {}
 
   async create(data: CreateProjectDto, userId: string): Promise<any> {
     //check-Duplicate-Projects
@@ -44,7 +40,6 @@ export class ProjectService {
         this.logger.error(err);
         throw new InternalServerErrorException('Internal Server Error');
       });
-    console.log(project);
 
     // return
     return {

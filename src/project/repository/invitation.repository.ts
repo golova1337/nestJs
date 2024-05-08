@@ -24,11 +24,11 @@ export class InvitationRepository {
 
   async findInvitationAndDelete(
     projectId: string,
-    invitationToken: string,
+    token: string,
   ): Promise<any> {
     const project = await this.invitationModel.findOneAndDelete({
       projectId: projectId,
-      token: invitationToken,
+      token: token,
     });
 
     return project;

@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
   Param,
   Post,
   Query,
@@ -20,7 +21,7 @@ import { RolesGuard } from 'src/utils/common/guard/roles/roles.guard';
 @ApiBearerAuth()
 @ApiTags('projects settingss')
 @UseGuards(RolesGuard)
-@Controller('/v1/api/projects/:projectId/settings')
+@Controller('/projects/:projectId/settings')
 export class ProjectSettingsController {
   constructor(
     private readonly settingsProjectService: SettingsProjectService,
@@ -29,6 +30,7 @@ export class ProjectSettingsController {
   @Post('/access')
   @Roles('user')
   @UseInterceptors(VerifyOwner)
+  @HttpCode(201)
   async access(
     @Body() body: AccessProjectDto,
     @Param('projectId') projectId: string,
@@ -46,15 +48,16 @@ export class ProjectSettingsController {
   //confirm invitation
   @Get('/access')
   @Roles('user')
+  @HttpCode(200)
   async gainAccess(
     @Param('projectId') projectId: string,
-    @Query('invitationToken') invitationToken: string,
+    @Query('invitationToken') token: string,
   ): Promise<responseSuccesfully> {
     // run service
 
     const result = await this.settingsProjectService.gainAccess({
       projectId,
-      invitationToken,
+      token,
     });
 
     //return reasponse

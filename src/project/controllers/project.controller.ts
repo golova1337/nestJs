@@ -8,6 +8,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  HttpCode,
 } from '@nestjs/common';
 import { ProjectService } from '../services/project.service';
 import { CreateProjectDto } from '../dto/create-project.dto';
@@ -22,12 +23,13 @@ import { RolesGuard } from 'src/utils/common/guard/roles/roles.guard';
 @ApiBearerAuth()
 @ApiTags('projects')
 @UseGuards(RolesGuard)
-@Controller('v1/api/projects')
+@Controller('/projects')
 export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
 
   @Post()
   @Roles('user')
+  @HttpCode(201)
   @ApiBody({ type: CreateProjectDto })
   async create(
     @Body() createProjectDto: CreateProjectDto,
@@ -44,6 +46,7 @@ export class ProjectController {
 
   @Get()
   @Roles('user')
+  @HttpCode(200)
   async findAll(@Req() req: Request): Promise<responseSuccesfully> {
     // get condition
     const query = req.query;
@@ -58,12 +61,12 @@ export class ProjectController {
 
   @Get(':projectId')
   @Roles('user')
+  @HttpCode(200)
   async findOne(
     @Param('projectId') projectId: string,
     @Req() req: Request,
   ): Promise<responseSuccesfully> {
     const userId = req.user['id'];
-    console.log();
 
     // run service
     const result = await this.projectService.findOne({ userId, projectId });
@@ -74,6 +77,7 @@ export class ProjectController {
 
   @Patch(':projectId')
   @Roles('user')
+  @HttpCode(200)
   @ApiBody({ type: UpdateProjectDto })
   async update(
     @Req() req: Request,
@@ -94,6 +98,7 @@ export class ProjectController {
 
   @Delete('/delete')
   @Roles('user')
+  @HttpCode(204)
   async remove(
     @Body('ids') ids: string[],
     @Req() req: Request,

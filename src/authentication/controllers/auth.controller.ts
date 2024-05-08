@@ -6,6 +6,7 @@ import {
   HttpCode,
   Req,
   UseGuards,
+  Version,
 } from '@nestjs/common';
 import { RegistrationhDto } from '../dto/auth-dto';
 import { AuthService } from '../services/auth.service';
@@ -26,7 +27,7 @@ import {
 import { Public } from 'src/utils/common/guard/public.decorator';
 
 @ApiTags('Auth')
-@Controller('v1/api/')
+@Controller()
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 

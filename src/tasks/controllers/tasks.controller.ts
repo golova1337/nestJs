@@ -10,6 +10,7 @@ import {
   UseInterceptors,
   Query,
   Req,
+  HttpCode,
 } from '@nestjs/common';
 import { TasksService } from '../services/tasks.service';
 import { CreateTaskDto } from '../dto/create-task.dto';
@@ -26,12 +27,13 @@ import { Request } from 'express';
 @ApiTags('tasks')
 @UseGuards(RolesGuard)
 @UseInterceptors(VerifyOwner)
-@Controller('/v1/api/projects/:projectId/tasks')
+@Controller('/projects/:projectId/tasks')
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
   @Post()
   @Roles('user')
+  @HttpCode(201)
   async create(
     @Body() createTaskDto: CreateTaskDto,
     @Param('projectId') projectId: string,
@@ -44,6 +46,7 @@ export class TasksController {
 
   @Get()
   @Roles('user')
+  @HttpCode(200)
   async findAll(
     @Param('projectId') projectId: string,
     @Query() sort: { sortField?: string; sortOrder: string },
@@ -58,6 +61,7 @@ export class TasksController {
 
   @Get(':taskId')
   @Roles('user')
+  @HttpCode(200)
   async findOne(
     @Param() param: { projectId: string; taskId: string },
     @Req() req: Request,
@@ -71,6 +75,7 @@ export class TasksController {
 
   @Patch(':taskId')
   @Roles('user')
+  @HttpCode(200)
   async update(
     @Body() updateTaskDto: UpdateTaskDto,
     @Param() params: { taskId: string; projectId: string },
@@ -88,6 +93,7 @@ export class TasksController {
 
   @Delete(':taskId')
   @Roles('user')
+  @HttpCode(204)
   async remove(
     @Param() params: { taskId: string; projectId: string },
   ): Promise<responseSuccesfully> {
@@ -99,6 +105,7 @@ export class TasksController {
 
   @Patch(':taskId/assignee')
   @Roles('user')
+  @HttpCode(200)
   async assignee(
     @Req() req: Request,
     @Param() params: { taskId: string; projectId: string },

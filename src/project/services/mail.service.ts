@@ -1,9 +1,10 @@
 import { MailerService } from '@nestjs-modules/mailer';
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { OnQueueActive, Process, Processor } from '@nestjs/bull';
 import { ConfigService } from '@nestjs/config';
+import { Job } from 'bull';
 import { EmojiLogger } from 'src/utils/logger/LoggerService';
 
-@Injectable()
+@Processor('send-mail')
 export class MailService {
   private readonly logger = new EmojiLogger();
   constructor(
@@ -11,21 +12,22 @@ export class MailService {
     private configService: ConfigService,
   ) {}
 
-  async sendMail(invitations) {
+  @Process('send mails')
+  async sendMail(job: Job) {
     await Promise.all(
-      invitations.map(async (invitation) => {
-        await this.mailService
-          .sendMail({
-            from: `Providenci Kassulke <${this.configService.get<string>('EMAIL_USERNAME')}>`,
-            to: invitation.email,
-            subject: 'Invitation',
-            text: ` forward to the link   http://localhost:${parseInt(this.configService.get<string>('PORT'), 10) || 3000}/v1/api/projects/${invitation.projectId}/settings/access?invitationToken=${invitation.token}`,
-          })
-          .catch((err) => {
-            this.logger.error(err);
-            throw new InternalServerErrorException('Internal Server Error');
-          });
+      job.data.name.map(async (invitation) => {
+        await this.mailService.sendMail({
+          from: `Providenci Kassulke <${this.configService.get<string>('EMAIL_USERNAME')}>`,
+          to: invitation.email,
+          subject: 'Invitation',
+          text: ` forward to the link   http://localhost:${parseInt(this.configService.get<string>('PORT'), 10) || 3000}/v1/api/projects/${job.data.name.projectId}/settings/access?invitationToken=${job.data.name.token}`,
+        });
+        return {};
       }),
     );
+  }
+  @OnQueueActive()
+  onActive(job: Job) {
+    console.log('Local Queue is active');
   }
 }

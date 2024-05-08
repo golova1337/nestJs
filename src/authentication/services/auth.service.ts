@@ -90,7 +90,6 @@ export class AuthService {
   //logout
   async logout(id: string) {
     const result = await this.authRepository.logout(id);
-    console.log(result);
 
     //   //return
     return {

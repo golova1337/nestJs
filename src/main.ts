@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { useContainer } from 'class-validator';
 import { EmojiLogger } from './utils/logger/LoggerService';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -23,6 +23,8 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
+  //version
+  app.enableVersioning({ type: VersioningType.URI, defaultVersion: '1' });
   await app.listen(parseInt(process.env.PORT, 10) || 3000);
 }
 bootstrap();
