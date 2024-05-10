@@ -64,7 +64,12 @@ export class SettingsProjectService {
     );
 
     // save invitation
-    await this.invitationRepository.create(createInvitationTokens);
+    await this.invitationRepository
+      .create(createInvitationTokens)
+      .catch((err) => {
+        this.logger.error(err);
+        throw new InternalServerErrorException('Internal Server Error');
+      });
 
     // send invitation
     await this.sendQueue.add(

@@ -1,27 +1,65 @@
-# Use root/example as user/password credentials
 version: '3.1'
 
 services:
-  mongo:
+  node-app:
+    build: .
+    image: node-app
+    env_file: ./.env
+    environment:
+      DATABASE_NAME: ${DOCKER_DATABASE_NAME}
+      DATABASE_USER: ${DOCKER_MONGO_ROOT_USERNAME}
+      DATABASE_PASS: ${DOCKER_MONGO_ROOT_PASSWORD}
+      DATABASE_URI: ${DOCKER_DATABASE_URI}
+      REDIS_HOST: ${DOCKER_REDIS_HOST}
+      REDIS_PORT: ${DOCKER_REDIS_PORT}
+      REDIS_PASSWORD: ${DOCKER_REDIS_PASS}
+    restart: always
+    ports:
+      - '${PORT}:3000'
+    depends_on:
+      - mongodb
+      - cache
+    networks:
+      - node-network
+
+  mongodb:
     image: mongo
     env_file: ./.env
     restart: always
     ports:
       - '27017:27017'
     environment:
+      MONGO_INITDB_ROOT_USERNAME: ${DOCKER_MONGO_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${DOCKER_MONGO_ROOT_PASSWORD}
       MONGO_INITDB_SCRIPT: ./src/_volumes/mongo-init/mongo-init.js
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
     volumes:
       - .:/src
       - ./src/_volumes/mongo-init/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - node-network
+
   mongo-express:
     image: mongo-express
     restart: always
     ports:
-      - 8081:8081
+      - '8081:8081'
     environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_ROOT_USERNAME}
-      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_ROOT_PASSWORD}
-      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@mongo:27017/
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${DOCKER_MONGO_ROOT_USERNAME}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${DOCKER_MONGO_ROOT_PASSWORD}
+      ME_CONFIG_MONGODB_URL: mongodb://${DOCKER_MONGO_ROOT_USERNAME}:${DOCKER_MONGO_ROOT_PASSWORD}@mongodb:27017/
       ME_CONFIG_BASICAUTH: false
+    networks:
+      - node-network
+
+  cache:
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning --requirepass ${DOCKER_REDIS_PASS}
+    networks:
+      - node-network
+
+networks:
+  node-network:
+    driver: bridge

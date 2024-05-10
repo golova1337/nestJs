@@ -50,7 +50,7 @@ export class AuthService {
     // check user in DB
     const user = await this.authRepository.findOne(data.email).catch((err) => {
       this.logger.error(err);
-      throw new InternalServerErrorException('Internal Servers');
+      throw new InternalServerErrorException('Internal Servers Error');
     });
 
     //compare password
@@ -64,7 +64,7 @@ export class AuthService {
       .getTokens(user._id, user.role)
       .catch((err) => {
         this.logger.error(err);
-        throw new InternalServerErrorException('Internal Servers');
+        throw new InternalServerErrorException('Internal Servers Error');
       });
 
     //update refreshToken
@@ -89,7 +89,10 @@ export class AuthService {
 
   //logout
   async logout(id: string) {
-    const result = await this.authRepository.logout(id);
+    const result = await this.authRepository.logout(id).catch((err) => {
+      this.logger.error(err);
+      throw new InternalServerErrorException('Internal Servers Error');
+    });
 
     //   //return
     return {

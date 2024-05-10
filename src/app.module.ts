@@ -2,7 +2,7 @@ import { Module, ValidationPipe } from '@nestjs/common';
 import { AuthModule } from './authentication/auth.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { JwtModule } from '@nestjs/jwt';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { ProjectModule } from './project/project.module';
 import { AccessTokenStrategy } from './utils/strategies/accessToken.strategy';
@@ -19,7 +19,12 @@ import { BullModule } from '@nestjs/bull';
       envFilePath: '.env',
       isGlobal: true,
     }),
-    MongooseModule.forRoot(process.env.URL, {
+    MongooseModule.forRoot(process.env.LOCALHOST_URL, {
+      dbName: process.env.DATABASE_NAME,
+      // auth: {
+      //   username: process.env.DOCKER_MONGO_ROOT_USERNAME,
+      //   password: process.env.DOCKER_MONGO_ROOT_PASSWORD,          //Setup for docker
+      // },
       minPoolSize: 3,
       maxPoolSize: 10,
     }),
@@ -37,7 +42,17 @@ import { BullModule } from '@nestjs/bull';
         },
       },
     }),
-    BullModule.forRoot({ redis: { host: 'localhost', port: 6379 } }),
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        redis: {
+          host: configService.get('REDIS_HOST'),
+          port: configService.get('REDIS_PORT'),
+          // password: configService.get('DOCKER_REDIS_PASS'),  //Setup for docker
+        },
+      }),
+      inject: [ConfigService],
+    }),
     AuthModule,
     ProjectModule,
     TasksModule,

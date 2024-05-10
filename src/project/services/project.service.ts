@@ -24,7 +24,7 @@ export class ProjectService {
       .findByIdAndTitle(userId, data.title)
       .catch((err) => {
         this.logger.error(err);
-        throw new InternalServerErrorException('Internal Servers');
+        throw new InternalServerErrorException('Internal Server Error');
       });
 
     if (projects.length != 0) {

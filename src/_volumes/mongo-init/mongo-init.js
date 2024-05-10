@@ -1,5 +1,5 @@
-db.auth('root', 'example');
-db = db.getSiblingDB('test');
+db = db.getSiblingDB('nest');
 
 db.createCollection('users');
 db.createCollection('projects');
+db.createCollection('invitations');

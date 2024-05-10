@@ -22,7 +22,6 @@ export class MailService {
           subject: 'Invitation',
           text: ` forward to the link   http://localhost:${parseInt(this.configService.get<string>('PORT'), 10) || 3000}/v1/api/projects/${job.data.name.projectId}/settings/access?invitationToken=${job.data.name.token}`,
         });
-        return {};
       }),
     );
   }

@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   HttpCode,
+  HttpStatus,
   Param,
   Post,
   Query,
@@ -15,8 +16,15 @@ import { Response } from 'src/helpers/response/Response';
 import { responseSuccesfully } from 'src/helpers/types/response-type';
 import { SettingsProjectService } from '../services/setting-project.service';
 import { VerifyOwner } from '../interceptors/verifyOwnerByParam.interceptor';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { RolesGuard } from 'src/utils/common/guard/roles/roles.guard';
+import { ApiErrorDecorator } from 'src/utils/common/decorators/error/error.decorator';
 
 @ApiBearerAuth()
 @ApiTags('projects settingss')
@@ -31,6 +39,13 @@ export class ProjectSettingsController {
   @Roles('user')
   @UseInterceptors(VerifyOwner)
   @HttpCode(201)
+  @ApiOperation({ description: 'Create an invitation' })
+  @ApiErrorDecorator(HttpStatus.BAD_REQUEST, 'Bad Request', 'Bad Request')
+  @ApiErrorDecorator(
+    HttpStatus.INTERNAL_SERVER_ERROR,
+    'Internal Servers Error',
+    'Internal Servers Error',
+  )
   async access(
     @Body() body: AccessProjectDto,
     @Param('projectId') projectId: string,
@@ -49,9 +64,23 @@ export class ProjectSettingsController {
   @Get('/access')
   @Roles('user')
   @HttpCode(200)
+  @ApiOperation({ description: 'accept the invitation ' })
+  @ApiErrorDecorator(HttpStatus.BAD_REQUEST, 'Bad Request', 'Bad Request')
+  @ApiParam({ name: 'projectId', type: 'string', required: true })
+  @ApiQuery({
+    name: 'token',
+    type: 'string',
+    description: 'invitation token, you can receive it by e-mail ',
+    required: true,
+  })
+  @ApiErrorDecorator(
+    HttpStatus.INTERNAL_SERVER_ERROR,
+    'Internal Servers Error',
+    'Internal Servers Error',
+  )
   async gainAccess(
     @Param('projectId') projectId: string,
-    @Query('invitationToken') token: string,
+    @Query('token') token: string,
   ): Promise<responseSuccesfully> {
     // run service
 
