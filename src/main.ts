@@ -18,8 +18,8 @@ async function bootstrap() {
     .setTitle('Project')
     .setDescription('The projects API description')
     .setVersion('1.0')
-    .addTag('project')
     .addBearerAuth()
+    .addServer('v1')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);

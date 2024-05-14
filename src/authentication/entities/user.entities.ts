@@ -10,7 +10,7 @@ export class TokenInfo {
   @Prop({ type: String })
   token: string;
 
-  @Prop({ type: Date })
+  @Prop({ type: Date, default: Date.now() + 7 * 24 * 60 * 60 * 1000 })
   expiresIn: Date;
 }
 
@@ -46,7 +46,7 @@ export class User {
   role: Roles;
 
   @Prop({ type: TokenInfo })
-  RefreshToken: TokenInfo;
+  refreshToken: TokenInfo;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

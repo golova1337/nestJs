@@ -44,7 +44,7 @@ export class Project {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
   userId: string;
 
-  @Prop({ type: String, required: true, unique: true, trim: true })
+  @Prop({ type: String, required: true, trim: true })
   title: string;
 
   @Prop({ type: String, trim: true })

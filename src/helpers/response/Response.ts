@@ -1,11 +1,13 @@
-import { responseSuccesfully } from '../types/response-type';
+import { CommonResponse } from '../types/response-type';
 
 export class Response {
-  static succsessfully(result): responseSuccesfully {
+  static succsessfully(result): CommonResponse<any> {
     return {
       status: true,
       error: false,
-      ...result,
+      message: result.message,
+      meta: result.meta,
+      data: result.data,
     };
   }
 }

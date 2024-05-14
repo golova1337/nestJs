@@ -23,6 +23,7 @@ export class ProjectRepository {
   async findAll(data): Promise<Project[] | []> {
     //destructurisation
     const { pagin, sorting, filters } = data;
+
     return await this.projectModel
       .find(filters)
       .sort({ [sorting.sortField]: sorting.sortOrder })

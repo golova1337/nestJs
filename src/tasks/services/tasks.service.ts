@@ -19,8 +19,8 @@ export class TasksService {
         throw new InternalServerErrorException('Internal Server Error');
       });
     return {
-      message: 'The task has been created ',
-      task,
+      message: 'The task has been created',
+      data: { task },
       meta: {},
     };
   }
@@ -44,7 +44,7 @@ export class TasksService {
     // return
     return {
       message: 'All tasks',
-      tasks,
+      data: { tasks },
       meta: {},
     };
   }
@@ -61,7 +61,7 @@ export class TasksService {
     // return
     return {
       message: 'one task',
-      task,
+      data: { task },
       meta: {},
     };
   }
@@ -82,7 +82,7 @@ export class TasksService {
     // return
     return {
       message: 'update task',
-      task,
+      data: { task },
       meta: {},
     };
   }
@@ -96,7 +96,7 @@ export class TasksService {
     // return
     return {
       message: 'remove task',
-      task,
+      data: { task },
       meta: {},
     };
   }

@@ -24,8 +24,9 @@ export class VerifyOwner implements NestInterceptor {
     // run repo find project by projectId and userId
     const verify = await this.projectRepository.findOne({ userId, projectId });
     if (!verify) {
-      throw new BadRequestException('You do not have access to it');
+      throw new BadRequestException('Bad Request');
     }
+
     return next.handle();
   }
 }

@@ -14,13 +14,14 @@ export class MailService {
 
   @Process('send mails')
   async sendMail(job: Job) {
+
     await Promise.all(
       job.data.name.map(async (invitation) => {
         await this.mailService.sendMail({
           from: `Providenci Kassulke <${this.configService.get<string>('EMAIL_USERNAME')}>`,
           to: invitation.email,
           subject: 'Invitation',
-          text: ` forward to the link   http://localhost:${parseInt(this.configService.get<string>('PORT'), 10) || 3000}/v1/api/projects/${job.data.name.projectId}/settings/access?invitationToken=${job.data.name.token}`,
+          text: ` forward to the link   http://localhost:${parseInt(this.configService.get<string>('PORT'), 10) || 3000}/v1/projects/${invitation.projectId}/settings/access?token=${invitation.token}`,
         });
       }),
     );

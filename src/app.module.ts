@@ -12,6 +12,7 @@ import { AccessTokenGuard } from './utils/common/guard/jwt/accessToken.guard';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { TasksModule } from './tasks/tasks.module';
 import { BullModule } from '@nestjs/bull';
+import { SeedModule } from './seed/seed.module';
 
 @Module({
   imports: [
@@ -19,14 +20,19 @@ import { BullModule } from '@nestjs/bull';
       envFilePath: '.env',
       isGlobal: true,
     }),
-    MongooseModule.forRoot(process.env.LOCALHOST_URL, {
-      dbName: process.env.DATABASE_NAME,
-      // auth: {
-      //   username: process.env.DOCKER_MONGO_ROOT_USERNAME,
-      //   password: process.env.DOCKER_MONGO_ROOT_PASSWORD,          //Setup for docker
-      // },
-      minPoolSize: 3,
-      maxPoolSize: 10,
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        uri: configService.get('LOCALHOST_URL'),
+        dbName: configService.get('DATABASE_NAME'),
+        // auth: {
+        //   username: configService.get('DOCKER_MONGO_ROOT_USERNAME'),
+        //   password: configService.get('DOCKER_MONGO_ROOT_PASSWORD'),               //Setup for docker
+        // },
+        minPoolSize: 3,
+        maxPoolSize: 10,
+      }),
+      inject: [ConfigService],
     }),
     JwtModule.register({
       global: true,
@@ -56,6 +62,7 @@ import { BullModule } from '@nestjs/bull';
     AuthModule,
     ProjectModule,
     TasksModule,
+    SeedModule,
   ],
   controllers: [],
   providers: [

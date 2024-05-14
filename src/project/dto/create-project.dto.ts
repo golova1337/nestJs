@@ -5,6 +5,7 @@ export class CreateProjectDto {
   @ApiProperty({
     example: 'My first project',
     description: 'You can not have two projects with the same name',
+    name: 'title',
   })
   @IsNotEmpty()
   title: string;
@@ -12,6 +13,7 @@ export class CreateProjectDto {
   //description
   @ApiProperty({
     example: 'It is my first project',
+    name: 'description',
   })
   @ApiPropertyOptional()
   @IsOptional()

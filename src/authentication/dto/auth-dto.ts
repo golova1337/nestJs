@@ -10,10 +10,15 @@ import { IsPasswordsMatchingConstraint } from '../decorators/isPasswordsMatching
 import { ApiProperty } from '@nestjs/swagger';
 
 export class RegistrationhDto {
-  @IsEmail({}, { message: 'wrong' })
+  @IsEmail()
   @IsNotEmpty()
   @Validate(IsEmailUniqueConstraint)
-  @ApiProperty({ type: String, example: 'danil@gmail.com', required: true })
+  @ApiProperty({
+    type: String,
+    example: 'danil@gmail.com',
+    required: true,
+    name: 'email',
+  })
   email: string;
 
   @Length(8, 32)
@@ -23,7 +28,8 @@ export class RegistrationhDto {
     description:
       "Should consist of at least 8 characters, include at least 1 uppercase letter, 1 number, and 1 special character: '!/_@#$%^&*()]'.",
     example: 'Example123!',
-    required: true
+    required: true,
+    name: 'password',
   })
   password: string;
 
@@ -33,7 +39,8 @@ export class RegistrationhDto {
     type: String,
     description: 'the same like password',
     example: 'Example123!',
-    required: true
+    required: true,
+    name: 'passwordRepeat',
   })
   @Validate(IsPasswordsMatchingConstraint)
   passwordRepeat: string;

@@ -6,7 +6,6 @@ import {
 } from '@nestjs/common';
 import { RegistrationhDto } from '../dto/auth-dto';
 import { AuthRepository } from '../repository/auth.repository';
-import { Result } from '../interface/auth-interface';
 import { compare, compareSync, hash } from 'bcryptjs';
 import { TokenService } from './token.servise';
 import { LoginDto } from '../dto/login-dto';
@@ -21,7 +20,7 @@ export class AuthService {
   ) {}
 
   //SINGUP
-  async singUp(user: RegistrationhDto): Promise<Result> {
+  async singUp(user: RegistrationhDto) {
     //hash
     const hashPassword: string = await hash(user.password, 10);
 
@@ -38,15 +37,13 @@ export class AuthService {
 
     //return
     return {
-      massage: 'Registration Successfully',
-      id: createUser._id,
-      email: createUser.email,
+      message: 'Registration is Successful',
       meta: {},
     };
   }
 
   //LOGIN
-  async login(data: LoginDto): Promise<Result> {
+  async login(data: LoginDto) {
     // check user in DB
     const user = await this.authRepository.findOne(data.email).catch((err) => {
       this.logger.error(err);
@@ -77,13 +74,12 @@ export class AuthService {
 
     //   //return
     return {
-      massage: 'Login Successfully',
-      id: user._id,
-      email: user.email,
-      meta: {
+      message: 'Login Successfully',
+      data: {
         accessToken,
         refreshToken,
       },
+      meta: {},
     };
   }
 
@@ -96,10 +92,8 @@ export class AuthService {
 
     //   //return
     return {
-      massage: 'Logout Successfully',
-      id: id,
-      accessToken: null,
-      refreshToken: null,
+      message: 'Logout Successfully',
+      data: { accessToken: null, refreshToken: null },
       meta: {},
     };
   }
@@ -107,15 +101,16 @@ export class AuthService {
   //refresh
   async refreshTokens(userId: string, refreshTokenOld: string) {
     //get user
+
     const user = await this.authRepository.findById(userId);
-    if (!user || !user.RefreshToken.token)
+    if (!user || !user.refreshToken.token)
       throw new ForbiddenException('Access Denied');
 
     //compare refresh token
 
     const refreshTokenMatches = await compare(
       refreshTokenOld,
-      user.RefreshToken.token,
+      user.refreshToken.token,
     );
 
     if (!refreshTokenMatches) throw new ForbiddenException('Access Denied');
@@ -129,11 +124,8 @@ export class AuthService {
     //update refresh token DB
     await this.authRepository.updateRefreshToken(user.id, refreshToken);
     return {
-      massage: 'Refresh Successfully',
-      id: userId,
-      email: user.email,
-      accessToken,
-      refreshToken,
+      message: 'Refresh Successfully',
+      data: { accessToken, refreshToken },
       meta: {},
     };
   }

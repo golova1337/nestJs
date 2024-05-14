@@ -5,13 +5,17 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Status } from '../enum/status-enum';
 
 export class UpdateProjectDto extends PartialType(CreateProjectDto) {
-  @ApiProperty({ type: String, example: 'ToDoList' })
+  @ApiProperty({ type: String, example: 'ToDoList', name: 'title' })
   @ApiPropertyOptional()
   @IsOptional()
   @IsNotEmpty()
   title?: string;
 
-  @ApiProperty({ type: String, example: 'your description' })
+  @ApiProperty({
+    type: String,
+    example: 'your description',
+    name: 'description',
+  })
   @ApiPropertyOptional()
   @IsOptional()
   description?: string;
@@ -20,6 +24,7 @@ export class UpdateProjectDto extends PartialType(CreateProjectDto) {
     description: 'Status of the item, available [ToDo,InProgress,Done]',
     enum: Status,
     example: Status.InProgress,
+    name: 'status',
     default: Status.ToDo,
   })
   @ApiPropertyOptional()

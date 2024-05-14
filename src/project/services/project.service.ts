@@ -43,8 +43,8 @@ export class ProjectService {
 
     // return
     return {
-      massage: 'Create projects Successfully',
-      project,
+      message: 'Create projects Successfully',
+      data: { project },
       meta: {},
     };
   }
@@ -72,9 +72,8 @@ export class ProjectService {
 
     //return
     return {
-      massage: 'Get projects Successfully',
-      id: filters.userId,
-      projects,
+      message: 'Get projects Successfully',
+      data: { projects },
       meta: {
         all_Projects: projects.length,
         first_Page: 1,
@@ -93,11 +92,14 @@ export class ProjectService {
         this.logger.error(err);
         throw new InternalServerErrorException('Internal Server Error');
       });
+    if (!project) {
+      throw new NotFoundException('Not found');
+    }
 
     //return response
     return {
       message: 'Get one by id succesfully',
-      project,
+      data: { project },
       meta: {},
     };
   }
@@ -123,22 +125,28 @@ export class ProjectService {
     //return response
     return {
       message: 'Update by id succesfully',
-      project,
+      data: { project },
       meta: {},
     };
   }
 
   async remove(userId: string, ids: string[]): Promise<any> {
-    const deleted = await this.projectRepository.remove(ids, userId);
+    const deleted = await this.projectRepository
+      .remove(ids, userId)
+      .catch((err) => {
+        this.logger.error(err);
+        throw new InternalServerErrorException('Internal Server Error');
+      });
     if (!deleted.deletedCount) {
-      throw new BadRequestException('You do not have access to remove it');
+      throw new BadRequestException('Bad Request');
     }
 
     return {
       message: 'Deleted succesfully',
-      id: userId,
-      removed: deleted.deletedCount,
-      ids_projects: ids,
+      data: {
+        removed: deleted.deletedCount,
+        ids_projects: ids,
+      },
       meta: {},
     };
   }

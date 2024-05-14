@@ -6,6 +6,7 @@ export class AccessProjectDto {
   @ApiProperty({
     example: ['dima@gmail.com'],
     description: 'colaborator, add by email only register user',
+    required: true,
   })
   @ApiPropertyOptional()
   @IsOptional()
