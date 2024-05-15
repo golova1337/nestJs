@@ -37,8 +37,9 @@ export class AuthService {
 
     //return
     return {
-      message: 'Registration is Successful',
-      meta: {},
+      data: {
+        email: createUser.email,
+      },
     };
   }
 
@@ -74,12 +75,10 @@ export class AuthService {
 
     //   //return
     return {
-      message: 'Login Successfully',
       data: {
         accessToken,
         refreshToken,
       },
-      meta: {},
     };
   }
 
@@ -92,9 +91,7 @@ export class AuthService {
 
     //   //return
     return {
-      message: 'Logout Successfully',
       data: { accessToken: null, refreshToken: null },
-      meta: {},
     };
   }
 
@@ -103,7 +100,8 @@ export class AuthService {
     //get user
 
     const user = await this.authRepository.findById(userId);
-    if (!user || !user.refreshToken.token)
+
+    if (!user || !user.refreshToken)
       throw new ForbiddenException('Access Denied');
 
     //compare refresh token
@@ -124,9 +122,7 @@ export class AuthService {
     //update refresh token DB
     await this.authRepository.updateRefreshToken(user.id, refreshToken);
     return {
-      message: 'Refresh Successfully',
       data: { accessToken, refreshToken },
-      meta: {},
     };
   }
 }

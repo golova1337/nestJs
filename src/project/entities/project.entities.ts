@@ -62,7 +62,7 @@ export class Project {
   status?: Status;
 
   @Prop({ type: [String], trim: true })
-  collaboration?: string[];
+  collaborations?: string[];
 }
 
 export const ProjectSchema = SchemaFactory.createForClass(Project);

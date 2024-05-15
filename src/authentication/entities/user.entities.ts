@@ -2,6 +2,7 @@ import { BadRequestException } from '@nestjs/common';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { Roles } from 'src/authentication/enum/user-roles-enum';
+import { Time } from '../enum/time-enum';
 
 export type UserDocument = User & Document;
 
@@ -10,8 +11,12 @@ export class TokenInfo {
   @Prop({ type: String })
   token: string;
 
-  @Prop({ type: Date, default: Date.now() + 7 * 24 * 60 * 60 * 1000 })
-  expiresIn: Date;
+  @Prop({
+    type: Date,
+    default: Date.now() + Time.seven, // seven day
+    expires: Time.seven, // seven day
+  })
+  expiresAt: Date;
 }
 
 @Schema({

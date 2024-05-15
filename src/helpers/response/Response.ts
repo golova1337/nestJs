@@ -5,8 +5,8 @@ export class Response {
     return {
       status: true,
       error: false,
-      message: result.message,
-      meta: result.meta,
+      message: 'Successfully',
+      meta: result.meta || {},
       data: result.data,
     };
   }

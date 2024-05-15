@@ -50,7 +50,7 @@ export class AuthController {
   @Post('singUp')
   async singUp(
     @Body() user: RegistrationhDto,
-  ): Promise<CommonResponse<undefined>> {
+  ): Promise<CommonResponse<{ email: string }>> {
     // run the service
     const result = await this.authService.singUp(user);
     //create response

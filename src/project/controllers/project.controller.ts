@@ -31,6 +31,7 @@ import { ApiErrorDecorator } from 'src/utils/common/decorators/error/error.decor
 import { Status } from '../enum/status-enum';
 import { RemoveDto } from '../dto/remove-project.dto';
 import { Project } from '../entities/project.entities';
+import { Field, Order } from '../enum/sort-enum';
 
 @ApiBearerAuth()
 @ApiTags('projects')
@@ -90,14 +91,14 @@ export class ProjectController {
   @ApiQuery({
     name: 'sortField',
     type: 'string',
-    enum: ['createdAT', 'updatedAt'],
+    enum: Field,
     description: 'defualt createdAT',
     required: false,
   })
   @ApiQuery({
     name: 'sortOrder',
     type: 'string',
-    enum: ['asc', 'desc'],
+    enum: Order,
     description: 'defualt asc',
     required: false,
   })

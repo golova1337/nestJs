@@ -26,6 +26,7 @@ import { Request } from 'express';
 import { ApiErrorDecorator } from 'src/utils/common/decorators/error/error.decorator';
 import { AssigneeDto } from '../dto/assignee-task.dto';
 import { Task } from 'src/project/entities/project.entities';
+import { Field, Order } from 'src/project/enum/sort-enum';
 
 @ApiBearerAuth()
 @ApiTags('tasks')
@@ -64,7 +65,7 @@ export class TasksController {
   })
   async findAll(
     @Param('projectId') projectId: string,
-    @Query() sort: { sortField?: string; sortOrder: string },
+    @Query() sort: { sortField?: Field; sortOrder: Order },
     @Req() req: Request,
   ): Promise<CommonResponse<Task[]>> {
     //run service

@@ -1,28 +1,28 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CommonResponse<T> {
-  @ApiProperty({ description: 'Статус выполнения запроса', required: true })
+  @ApiProperty({ description: 'Status of request fulfillment', required: true })
   status: boolean;
 
   @ApiProperty({
-    description: 'Флаг, указывающий на наличие ошибки',
+    description: 'Flag indicating the presence of an error',
     required: true,
     example: false,
   })
   error: boolean;
 
   @ApiProperty({
-    description: 'Сообщение об успешном выполнении или ошибках',
+    description: 'Reporting success or errors',
     required: true,
-    example: '"Action" successfully',
+    example: 'Successfully',
   })
   message: string;
 
-  @ApiProperty({ description: 'Дополнительные метаданные' })
+  @ApiProperty({ description: 'Additional metadata' })
   meta: object;
 
   @ApiProperty({
-    description: 'Данные ответа (необязательные)',
+    description: 'Response data (optional)',
     required: false,
   })
   data?: T;

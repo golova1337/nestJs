@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
+import { Time } from 'src/authentication/enum/time-enum';
 
 export type InvitationDocument = Invitation & Document;
 
@@ -22,8 +23,8 @@ export class Invitation {
   token: string;
   @Prop({
     type: Date,
-    expires: 7 * 24 * 60 * 60 * 1000,
-    default: Date.now() + 7 * 24 * 60 * 60 * 1000,
+    expires: Time.seven,
+    default: Date.now() + Time.seven,
   })
   expireAt: Date;
 }

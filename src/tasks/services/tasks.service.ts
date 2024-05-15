@@ -4,6 +4,7 @@ import { UpdateTaskDto } from '../dto/update-task.dto';
 import { TaskRepository } from '../repository/tasks.repository';
 import { sort } from '../../project/helpers/sortField-Order';
 import { EmojiLogger } from 'src/utils/logger/LoggerService';
+import { Field, Order } from 'src/project/enum/sort-enum';
 
 @Injectable()
 export class TasksService {
@@ -27,7 +28,7 @@ export class TasksService {
 
   async findAll(data: {
     projectId: string;
-    sort: { sortField?: string; sortOrder: string };
+    sort: { sortField?: Field; sortOrder: Order };
     userId: string;
   }) {
     //condition of sort, field and order ascending, descending
@@ -43,9 +44,7 @@ export class TasksService {
 
     // return
     return {
-      message: 'All tasks',
       data: { tasks },
-      meta: {},
     };
   }
 
@@ -60,9 +59,7 @@ export class TasksService {
 
     // return
     return {
-      message: 'one task',
       data: { task },
-      meta: {},
     };
   }
 
@@ -81,9 +78,7 @@ export class TasksService {
 
     // return
     return {
-      message: 'update task',
       data: { task },
-      meta: {},
     };
   }
 
@@ -95,9 +90,7 @@ export class TasksService {
     });
     // return
     return {
-      message: 'remove task',
       data: { task },
-      meta: {},
     };
   }
 
@@ -114,9 +107,7 @@ export class TasksService {
 
     // return
     return {
-      message: 'assignee succesfully',
       task,
-      meta: {},
     };
   }
 }

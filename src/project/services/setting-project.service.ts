@@ -90,9 +90,7 @@ export class SettingsProjectService {
     );
     // return
     return {
-      message: 'successful invitation',
       data: { collaborators },
-      meta: {},
     };
   }
 
@@ -116,9 +114,7 @@ export class SettingsProjectService {
     );
 
     return {
-      message: 'successful Collaboration ',
       data: { project: addCollaborate.title },
-      meta: {},
     };
   }
 }

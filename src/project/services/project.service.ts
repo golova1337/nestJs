@@ -43,9 +43,7 @@ export class ProjectService {
 
     // return
     return {
-      message: 'Create projects Successfully',
       data: { project },
-      meta: {},
     };
   }
 
@@ -72,7 +70,6 @@ export class ProjectService {
 
     //return
     return {
-      message: 'Get projects Successfully',
       data: { projects },
       meta: {
         all_Projects: projects.length,
@@ -98,9 +95,7 @@ export class ProjectService {
 
     //return response
     return {
-      message: 'Get one by id succesfully',
       data: { project },
-      meta: {},
     };
   }
 
@@ -124,9 +119,7 @@ export class ProjectService {
 
     //return response
     return {
-      message: 'Update by id succesfully',
       data: { project },
-      meta: {},
     };
   }
 
@@ -142,12 +135,10 @@ export class ProjectService {
     }
 
     return {
-      message: 'Deleted succesfully',
       data: {
         removed: deleted.deletedCount,
         ids_projects: ids,
       },
-      meta: {},
     };
   }
 }
