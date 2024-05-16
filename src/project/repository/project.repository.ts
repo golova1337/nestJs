@@ -16,7 +16,7 @@ export class ProjectRepository {
     return await newProject.save();
   }
 
-  async findByIdAndTitle(userId: string, title: string) {
+  async find(userId: string, title: string): Promise<Project[]> {
     return await this.projectModel.find({ userId: userId, title: title });
   }
 
@@ -58,18 +58,23 @@ export class ProjectRepository {
     );
   }
 
-  async remove(ids: string[], userId: string): Promise<any> {
-    return await this.projectModel.deleteMany({
+  async remove(ids: string[], userId: string): Promise<void> {
+    await this.projectModel.deleteMany({
       _id: { $in: ids },
       userId: userId,
     });
   }
 
-  async addCollaborate(projectId: string, collaborator: string): Promise<any> {
+  async addCollaborate(
+    projectId: string,
+    collaborator: string,
+  ): Promise<Project> {
+    console.log(collaborator);
+
     return await this.projectModel.findByIdAndUpdate(
       projectId,
       {
-        $addToSet: { collaboration: collaborator },
+        $set: { collaborations: collaborator },
       },
       { new: true },
     );

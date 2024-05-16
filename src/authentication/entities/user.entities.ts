@@ -28,6 +28,7 @@ export class TokenInfo {
   validateBeforeSave: true,
 })
 export class User {
+  _id?: string;
   @Prop({ type: String, unique: true, required: true })
   email: string;
 

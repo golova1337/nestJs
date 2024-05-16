@@ -4,10 +4,10 @@ import mongoose, { Model } from 'mongoose';
 import {
   Project,
   ProjectDocument,
+  Task,
 } from 'src/project/entities/project.entities';
 import { CreateTaskDto } from '../dto/create-task.dto';
 import { UpdateTaskDto } from '../dto/update-task.dto';
-import { title } from 'process';
 
 @Injectable()
 export class TaskRepository {
@@ -24,11 +24,15 @@ export class TaskRepository {
       {
         $push: { tasks: createTaskDto },
       },
-      { new: true },
+      { new: true, lean: true, select: { tasks: 1 } },
     );
   }
 
-  async findAll(projectId: string, sortQuery, userId: string): Promise<any> {
+  async findAll(
+    projectId: string,
+    sortQuery,
+    userId: string,
+  ): Promise<Task[] | []> {
     return await this.projectModel.aggregate([
       {
         $match: {
@@ -48,19 +52,21 @@ export class TaskRepository {
     taskId: string;
     projectId: string;
     userId: string;
-  }): Promise<any> {
-    return await this.projectModel.findOne({
-      _id: data.projectId,
-      userId: data.userId,
-      tasks: { $elemMatch: { _id: data.taskId } },
-    });
+  }): Promise<Project | null> {
+    return await this.projectModel.findOne(
+      {
+        _id: data.projectId,
+        userId: data.userId,
+      },
+      { tasks: { $elemMatch: { _id: data.taskId } } },
+    );
   }
 
   async update(
     taskId: string,
     projectId: string,
     updateTaskDto: UpdateTaskDto,
-  ): Promise<any> {
+  ): Promise<Project | null> {
     return await this.projectModel.findOneAndUpdate(
       { _id: projectId, tasks: { $elemMatch: { _id: taskId } } },
       {
@@ -70,6 +76,10 @@ export class TaskRepository {
           'tasks.$.status': updateTaskDto.status,
           'tasks.$.priority': updateTaskDto.priority,
         },
+      },
+      {
+        new: true,
+        select: { tasks: { $elemMatch: { _id: taskId } } },
       },
     );
   }
@@ -86,18 +96,22 @@ export class TaskRepository {
     userId: string;
     assignee: string;
     params: { taskId: string; projectId: string };
-  }): Promise<any> {
+  }): Promise<Project | null> {
     return await this.projectModel.findOneAndUpdate(
       {
         _id: data.params.projectId,
         userId: data.userId,
-        collaboration: { $in: data.assignee },
+        collaborations: { $in: [data.assignee] },
         tasks: { $elemMatch: { _id: data.params.taskId } },
       },
       {
         $set: {
           'tasks.$.assignee': data.assignee,
         },
+      },
+      {
+        new: true,
+        select: { tasks: { $elemMatch: { _id: data.params.taskId } } },
       },
     );
   }

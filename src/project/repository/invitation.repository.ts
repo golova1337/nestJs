@@ -25,7 +25,7 @@ export class InvitationRepository {
   async findInvitationAndDelete(
     projectId: string,
     token: string,
-  ): Promise<any> {
+  ): Promise<Invitation | null> {
     const project = await this.invitationModel.findOneAndDelete({
       projectId: projectId,
       token: token,

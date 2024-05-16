@@ -13,14 +13,14 @@ export class AuthRepository {
     return await createdUser.save();
   }
 
-  async findOne(email: string): Promise<any> {
+  async findOne(email: string): Promise<User | null> {
     return this.userModel.findOne({ email: email }).exec();
   }
-  async findById(userId: string): Promise<any> {
+  async findById(userId: string): Promise<User | null> {
     return this.userModel.findById({ _id: userId }).exec();
   }
 
-  async updateRefreshToken(id: string, refreshToken: string): Promise<any> {
+  async updateRefreshToken(id: string, refreshToken: string): Promise<void> {
     const hashedRefreshToken = await hash(refreshToken, 10);
     await this.userModel.findByIdAndUpdate(
       { _id: id },
@@ -32,8 +32,8 @@ export class AuthRepository {
     );
   }
 
-  async logout(id: string): Promise<any> {
-    return await this.userModel.findByIdAndUpdate(
+  async logout(id: string): Promise<void> {
+    await this.userModel.findByIdAndUpdate(
       id,
       {
         $unset: { refreshToken: 1 },
@@ -42,7 +42,7 @@ export class AuthRepository {
     );
   }
 
-  async findByEmail(emails: string[]): Promise<any> {
+  async findByEmail(emails: string[]): Promise<User[] | []> {
     return await this.userModel.find({ email: { $in: emails } });
   }
 }

@@ -10,6 +10,9 @@ import { InvitationRepository } from '../repository/invitation.repository';
 import { ProjectRepository } from '../repository/project.repository';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
+import { User } from 'src/authentication/entities/user.entities';
+import { Invitation } from '../entities/invitation.entities';
+import { Project } from '../entities/project.entities';
 
 @Injectable()
 export class SettingsProjectService {
@@ -43,9 +46,12 @@ export class SettingsProjectService {
     return invitations;
   }
 
-  async access(collaborators: string[], projectId: string): Promise<any> {
+  async access(
+    collaborators: string[],
+    projectId: string,
+  ): Promise<{ data: { collaborators: string[] } }> {
     // chekc collaborators
-    const chekColaborators = await this.authRepository
+    const chekColaborators: User[] | [] = await this.authRepository
       .findByEmail(collaborators)
       .catch((err) => {
         this.logger.error(err);
@@ -58,10 +64,11 @@ export class SettingsProjectService {
     }
 
     // create invitation
-    const createInvitationTokens = await this.createInvitationTokens(
-      collaborators,
-      projectId,
-    );
+    const createInvitationTokens: {
+      projectId: string;
+      email: string;
+      token: string;
+    }[] = await this.createInvitationTokens(collaborators, projectId);
 
     // save invitation
     await this.invitationRepository
@@ -94,21 +101,25 @@ export class SettingsProjectService {
     };
   }
 
-  async gainAccess(data: { projectId: string; token: string }): Promise<any> {
+  async gainAccess(data: {
+    projectId: string;
+    token: string;
+  }): Promise<{ data: { project: string } }> {
     const { projectId, token } = data;
     // find Invitation And Delete
-    const findInvitationAndDelete = await this.invitationRepository
-      .findInvitationAndDelete(projectId, token)
-      .catch((err) => {
-        this.logger.error(err);
-        throw new InternalServerErrorException('Internal Server Error');
-      });
+    const findInvitationAndDelete: Invitation | null =
+      await this.invitationRepository
+        .findInvitationAndDelete(projectId, token)
+        .catch((err) => {
+          this.logger.error(err);
+          throw new InternalServerErrorException('Internal Server Error');
+        });
 
     if (!findInvitationAndDelete) {
       throw new BadRequestException('Bad Request');
     }
     // push into an array collaboration of project
-    const addCollaborate = await this.projectRepository.addCollaborate(
+    const addCollaborate: Project = await this.projectRepository.addCollaborate(
       projectId,
       findInvitationAndDelete.email,
     );

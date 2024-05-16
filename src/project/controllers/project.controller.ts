@@ -10,6 +10,7 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import { ProjectService } from '../services/project.service';
 import { CreateProjectDto } from '../dto/create-project.dto';
@@ -32,6 +33,8 @@ import { Status } from '../enum/status-enum';
 import { RemoveDto } from '../dto/remove-project.dto';
 import { Project } from '../entities/project.entities';
 import { Field, Order } from '../enum/sort-enum';
+import { FindAllProject } from '../interface/queryFindAllProjects-interface';
+import { PerPage } from '../enum/perPage-enum';
 
 @ApiBearerAuth()
 @ApiTags('projects')
@@ -85,6 +88,7 @@ export class ProjectController {
     name: 'perPage',
     description: 'number of projects per page, default is 10',
     type: 'string',
+    enum: PerPage,
     required: false,
   })
   @ApiQuery({ name: 'status', type: 'string', enum: Status, required: false })
@@ -103,13 +107,15 @@ export class ProjectController {
     required: false,
   })
   @ApiCreatedResponse({ type: CommonResponse, status: 200 })
-  async findAll(@Req() req: Request): Promise<CommonResponse<Project[]>> {
+  async findAll(
+    @Req() req: Request,
+    @Query() query: FindAllProject,
+  ): Promise<CommonResponse<Project[]>> {
     // get condition
-    const query = req.query;
-    const userId = req.user['id'];
+    const userId: string = req.user['id'];
 
     // run service
-    const result = await this.projectService.findAll({ ...query, userId });
+    const result = await this.projectService.findAll(query, userId);
 
     //create response
     return Response.succsessfully(result);
