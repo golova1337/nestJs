@@ -5,6 +5,7 @@ import {
   ValidationArguments,
 } from 'class-validator';
 import { AuthRepository } from '../repository/auth.repository';
+import { User } from '../entities/user.entities';
 
 @ValidatorConstraint({ name: 'isEmailExist', async: true })
 @Injectable()
@@ -12,7 +13,8 @@ export class IsEmailExistConstraint implements ValidatorConstraintInterface {
   constructor(private authRepository: AuthRepository) {}
 
   async validate(email: string): Promise<boolean> {
-    return await this.authRepository.findOne(email);
+    const user: User = await this.authRepository.findOne(email);
+    return !!user;
   }
 
   defaultMessage(args: ValidationArguments) {

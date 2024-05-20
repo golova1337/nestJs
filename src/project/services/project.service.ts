@@ -12,16 +12,20 @@ import { isEmptyObj } from '../helpers/isEmptyObj';
 import { Project } from '../entities/project.entities';
 import { sort } from '../helpers/sortField-Order';
 import { pagination } from '../helpers/pagination ';
+import { FindAllProject } from '../interface/queryFindAllProjects-interface';
 
 @Injectable()
 export class ProjectService {
   private readonly logger = new EmojiLogger();
   constructor(private readonly projectRepository: ProjectRepository) {}
 
-  async create(data: CreateProjectDto, userId: string): Promise<any> {
+  async create(
+    data: CreateProjectDto,
+    userId: string,
+  ): Promise<{ data: { project: Project } }> {
     //check-Duplicate-Projects
-    const projects = await this.projectRepository
-      .findByIdAndTitle(userId, data.title)
+    const projects: Project[] = await this.projectRepository
+      .find(userId, data.title)
       .catch((err) => {
         this.logger.error(err);
         throw new InternalServerErrorException('Internal Server Error');
@@ -43,20 +47,24 @@ export class ProjectService {
 
     // return
     return {
-      message: 'Create projects Successfully',
       data: { project },
-      meta: {},
     };
   }
 
-  async findAll(condition): Promise<any> {
+  async findAll(
+    condition: FindAllProject,
+    userId: string,
+  ): Promise<{ data: { projects: Project[] | [] }; meta: object }> {
     //destructurisation
     let { page, perPage, sortField, sortOrder, ...filters } = condition;
 
     //condition of sort, field and order ascending, descending
-    const sorting = sort(sortField, sortOrder);
+    const sorting: { sortField: string; sortOrder: number } = sort(
+      sortField,
+      sortOrder,
+    );
     //Pagination
-    const pagin = pagination(page, perPage);
+    const pagin: { page: number; perPage: number } = pagination(page, perPage);
     // filter Filters
     filters = isEmptyObj(filters);
 
@@ -72,19 +80,21 @@ export class ProjectService {
 
     //return
     return {
-      message: 'Get projects Successfully',
       data: { projects },
       meta: {
         all_Projects: projects.length,
         first_Page: 1,
-        last_Page: Math.ceil(projects.length / perPage),
+        last_Page: Math.ceil(projects.length / +perPage),
         page,
         perPage,
       },
     };
   }
 
-  async findOne(data: { userId: string; projectId: string }): Promise<any> {
+  async findOne(data: {
+    userId: string;
+    projectId: string;
+  }): Promise<{ data: { project: Project } }> {
     // run repo
     const project: Project | null = await this.projectRepository
       .findOne(data)
@@ -98,9 +108,7 @@ export class ProjectService {
 
     //return response
     return {
-      message: 'Get one by id succesfully',
       data: { project },
-      meta: {},
     };
   }
 
@@ -108,7 +116,7 @@ export class ProjectService {
     userId: string,
     id: string,
     update: UpdateProjectDto,
-  ): Promise<any> {
+  ): Promise<{ data: { project: Project } }> {
     // run repository
 
     const project: Project | null = await this.projectRepository
@@ -124,30 +132,14 @@ export class ProjectService {
 
     //return response
     return {
-      message: 'Update by id succesfully',
       data: { project },
-      meta: {},
     };
   }
 
-  async remove(userId: string, ids: string[]): Promise<any> {
-    const deleted = await this.projectRepository
-      .remove(ids, userId)
-      .catch((err) => {
-        this.logger.error(err);
-        throw new InternalServerErrorException('Internal Server Error');
-      });
-    if (!deleted.deletedCount) {
-      throw new BadRequestException('Bad Request');
-    }
-
-    return {
-      message: 'Deleted succesfully',
-      data: {
-        removed: deleted.deletedCount,
-        ids_projects: ids,
-      },
-      meta: {},
-    };
+  async remove(userId: string, ids: string[]): Promise<void> {
+    await this.projectRepository.remove(ids, userId).catch((err) => {
+      this.logger.error(err);
+      throw new InternalServerErrorException('Internal Server Error');
+    });
   }
 }

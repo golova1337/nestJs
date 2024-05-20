@@ -78,7 +78,7 @@ export class ProjectSettingsController {
   @ApiOperation({
     summary: 'Accept the invitation.',
     description:
-      'Go back to the Login endpoint and log in as a new user, all seeds have password = Example123!, then go to the email account and use the collaboration invitation. Get the project ID and token to insert into the fields',
+      'Return to the Login endpoint and log in as the user to whom you sent the invitation, all seeds have password = Example123!, then go to the email account and use the collaboration invitation. Get the project ID and token to insert into the fields',
   })
   @ApiParam({ name: 'projectId', type: 'string', required: true })
   @ApiQuery({

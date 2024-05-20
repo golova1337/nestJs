@@ -25,7 +25,7 @@ export class SeedService implements OnModuleInit {
   // seeding
   async seedUsers(): Promise<void> {
     const users = await faker.helpers.multiple(this.generate, {
-      count: 5,
+      count: 1,
     });
 
     for (const userData of users) {

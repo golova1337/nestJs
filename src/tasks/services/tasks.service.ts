@@ -4,13 +4,18 @@ import { UpdateTaskDto } from '../dto/update-task.dto';
 import { TaskRepository } from '../repository/tasks.repository';
 import { sort } from '../../project/helpers/sortField-Order';
 import { EmojiLogger } from 'src/utils/logger/LoggerService';
+import { Field, Order } from 'src/project/enum/sort-enum';
+import { Project, Task } from 'src/project/entities/project.entities';
 
 @Injectable()
 export class TasksService {
   private readonly logger = new EmojiLogger();
   constructor(private readonly taskRepository: TaskRepository) {}
 
-  async create(createTaskDto: CreateTaskDto, projectId: string) {
+  async create(
+    createTaskDto: CreateTaskDto,
+    projectId: string,
+  ): Promise<{ data: { task: Task } }> {
     // run repository
     const task = await this.taskRepository
       .create(projectId, createTaskDto)
@@ -19,22 +24,20 @@ export class TasksService {
         throw new InternalServerErrorException('Internal Server Error');
       });
     return {
-      message: 'The task has been created',
-      data: { task },
-      meta: {},
+      data: { task: task.tasks[task.tasks.length - 1] },
     };
   }
 
   async findAll(data: {
     projectId: string;
-    sort: { sortField?: string; sortOrder: string };
+    sort: { sortField?: Field; sortOrder: Order };
     userId: string;
-  }) {
+  }): Promise<{ data: { tasks: Task[] | [] } }> {
     //condition of sort, field and order ascending, descending
     let { sortField, sortOrder } = data.sort;
     const sortQuery = sort(sortField, sortOrder);
     // run repository
-    const tasks = await this.taskRepository
+    const tasks: Task[] | [] = await this.taskRepository
       .findAll(data.projectId, sortQuery, data.userId)
       .catch((err) => {
         this.logger.error(err);
@@ -43,26 +46,26 @@ export class TasksService {
 
     // return
     return {
-      message: 'All tasks',
       data: { tasks },
-      meta: {},
     };
   }
 
-  async findOne(data: { taskId: string; projectId: string; userId: string }) {
+  async findOne(data: {
+    taskId: string;
+    projectId: string;
+    userId: string;
+  }): Promise<{ data: { task: Task } }> {
     // run repository
-    let task = await this.taskRepository.findOne(data).catch((err) => {
-      this.logger.error(err);
-      throw new InternalServerErrorException('Internal Server Error');
-    });
-    // get only requested task
-    task = task.tasks.find((task) => (task._id = data.taskId));
+    const task: Project | null = await this.taskRepository
+      .findOne(data)
+      .catch((err) => {
+        this.logger.error(err);
+        throw new InternalServerErrorException('Internal Server Error');
+      });
 
     // return
     return {
-      message: 'one task',
-      data: { task },
-      meta: {},
+      data: { task: task.tasks[0] },
     };
   }
 
@@ -70,9 +73,9 @@ export class TasksService {
     taskId: string,
     projectId: string,
     updateTaskDto: UpdateTaskDto,
-  ) {
+  ): Promise<{ data: { task: Task } }> {
     // run repository
-    const task = await this.taskRepository
+    const task: Project | null = await this.taskRepository
       .update(taskId, projectId, updateTaskDto)
       .catch((err) => {
         this.logger.error(err);
@@ -81,24 +84,16 @@ export class TasksService {
 
     // return
     return {
-      message: 'update task',
-      data: { task },
-      meta: {},
+      data: { task: task.tasks[0] },
     };
   }
 
-  async remove(params: { taskId: string; projectId: string }) {
+  async remove(params: { taskId: string; projectId: string }): Promise<void> {
     // run repository
-    const task = await this.taskRepository.remove(params).catch((err) => {
+    await this.taskRepository.remove(params).catch((err) => {
       this.logger.error(err);
       throw new InternalServerErrorException('Internal Server Error');
     });
-    // return
-    return {
-      message: 'remove task',
-      data: { task },
-      meta: {},
-    };
   }
 
   async assignee(data: {
@@ -107,16 +102,16 @@ export class TasksService {
     params: { taskId: string; projectId: string };
   }) {
     // run repository
-    const task = await this.taskRepository.assignee(data).catch((err) => {
-      this.logger.error(err);
-      throw new InternalServerErrorException('Internal Server Error');
-    });
+    const task: Project | null = await this.taskRepository
+      .assignee(data)
+      .catch((err) => {
+        this.logger.error(err);
+        throw new InternalServerErrorException('Internal Server Error');
+      });
 
     // return
     return {
-      message: 'assignee succesfully',
-      task,
-      meta: {},
+      data: { task: task.tasks },
     };
   }
 }

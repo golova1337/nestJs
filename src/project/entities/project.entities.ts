@@ -22,10 +22,10 @@ export class Task {
 
   @Prop({
     type: String,
-    default: 'Unassigned', // Используем функцию-генератор значения по умолчанию
+    default: 'Unassigned',
     trim: true,
   })
-  assignee?: string[];
+  assignee?: string;
 
   @Prop({ type: String, enum: Priority, default: Priority.Medium })
   priority?: Priority;
@@ -62,7 +62,7 @@ export class Project {
   status?: Status;
 
   @Prop({ type: [String], trim: true })
-  collaboration?: string[];
+  collaborations?: string[];
 }
 
 export const ProjectSchema = SchemaFactory.createForClass(Project);

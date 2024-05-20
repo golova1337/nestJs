@@ -9,7 +9,10 @@ export class TokenService {
     private configService: ConfigService,
   ) {}
 
-  async getTokens(userId: string, role: string) {
+  async getTokens(
+    userId: string,
+    role: string,
+  ): Promise<{ accessToken: string; refreshToken: string }> {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
         {
