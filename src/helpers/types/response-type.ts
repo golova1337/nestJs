@@ -1,7 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CommonResponse<T> {
-  @ApiProperty({ description: 'Status of request fulfillment', required: true })
+  @ApiProperty({
+    description: 'Status of request fulfillment',
+    required: true,
+  })
   status: boolean;
 
   @ApiProperty({
@@ -18,12 +21,12 @@ export class CommonResponse<T> {
   })
   message: string;
 
-  @ApiProperty({ description: 'Additional metadata' })
+  @ApiProperty({ description: 'Additional metadata', required: true })
   meta: object;
 
   @ApiProperty({
     description: 'Response data (optional)',
-    required: false,
+    required: true,
   })
   data?: T;
 }

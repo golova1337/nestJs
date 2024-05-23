@@ -14,7 +14,6 @@ export class MailService {
 
   @Process('send mails')
   async sendMail(job: Job) {
-
     await Promise.all(
       job.data.name.map(async (invitation) => {
         await this.mailService.sendMail({

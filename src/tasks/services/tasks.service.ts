@@ -4,8 +4,8 @@ import { UpdateTaskDto } from '../dto/update-task.dto';
 import { TaskRepository } from '../repository/tasks.repository';
 import { sort } from '../../project/helpers/sortField-Order';
 import { EmojiLogger } from 'src/utils/logger/LoggerService';
-import { Field, Order } from 'src/project/enum/sort-enum';
 import { Project, Task } from 'src/project/entities/project.entities';
+import { Sorting } from 'src/project/interface/queryFindAllProjects-interface';
 
 @Injectable()
 export class TasksService {
@@ -30,12 +30,12 @@ export class TasksService {
 
   async findAll(data: {
     projectId: string;
-    sort: { sortField?: Field; sortOrder: Order };
+    sort: Sorting;
     userId: string;
   }): Promise<{ data: { tasks: Task[] | [] } }> {
     //condition of sort, field and order ascending, descending
-    let { sortField, sortOrder } = data.sort;
-    const sortQuery = sort(sortField, sortOrder);
+    let { sortBy, sortOrder } = data.sort;
+    const sortQuery = sort({ sortBy, sortOrder });
     // run repository
     const tasks: Task[] | [] = await this.taskRepository
       .findAll(data.projectId, sortQuery, data.userId)

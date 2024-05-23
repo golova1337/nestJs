@@ -12,6 +12,7 @@ import { InvitationRepository } from './repository/invitation.repository';
 import { ProjectSettingsController } from './controllers/project-setting.controller';
 import { BullModule } from '@nestjs/bull';
 import { MailService } from './services/mail.service';
+import { EmojiLogger } from 'src/utils/logger/LoggerService';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { MailService } from './services/mail.service';
     SettingsProjectService,
     MailService,
     AuthRepository,
+    EmojiLogger,
   ],
 })
 export class ProjectModule {}

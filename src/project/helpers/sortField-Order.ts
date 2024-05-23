@@ -1,13 +1,12 @@
 import { Field, Order } from '../enum/sort-enum';
 
-export function sort(
-  field: Field,
-  order: Order,
-): { sortField: string; sortOrder: number } {
-  const sortField = field || 'createdAt';
-  const sortOrder = order === 'asc' ? 1 : -1;
+export function sort(sorting: { sortBy: Field; sortOrder: Order }) {
+  let { sortBy, sortOrder } = sorting;
+  sortBy = sortBy === Field.createdAt ? Field.createdAt : Field.updatedAt;
+  sortOrder =
+    sortOrder === Order.ascending ? Order.ascending : Order.descending;
   return {
-    sortField,
+    sortBy,
     sortOrder,
   };
 }

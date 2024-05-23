@@ -26,7 +26,7 @@ export class ProjectRepository {
 
     return await this.projectModel
       .find(filters)
-      .sort({ [sorting.sortField]: sorting.sortOrder })
+      .sort({ [sorting.sortBy]: sorting.sortOrder })
       .skip((pagin.page - 1) * data.perPage)
       .limit(pagin.perPage);
   }
@@ -69,8 +69,6 @@ export class ProjectRepository {
     projectId: string,
     collaborator: string,
   ): Promise<Project> {
-    console.log(collaborator);
-
     return await this.projectModel.findByIdAndUpdate(
       projectId,
       {

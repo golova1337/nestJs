@@ -12,7 +12,8 @@ import { isEmptyObj } from '../helpers/isEmptyObj';
 import { Project } from '../entities/project.entities';
 import { sort } from '../helpers/sortField-Order';
 import { pagination } from '../helpers/pagination ';
-import { FindAllProject } from '../interface/queryFindAllProjects-interface';
+import { QueryFindAllProjects } from '../interface/queryFindAllProjects-interface';
+import { Field, Order } from '../enum/sort-enum';
 
 @Injectable()
 export class ProjectService {
@@ -52,21 +53,25 @@ export class ProjectService {
   }
 
   async findAll(
-    condition: FindAllProject,
+    condition: Partial<QueryFindAllProjects>,
     userId: string,
   ): Promise<{ data: { projects: Project[] | [] }; meta: object }> {
     //destructurisation
-    let { page, perPage, sortField, sortOrder, ...filters } = condition;
+    let { page, perPage, sortBy, sortOrder, ...filters } = condition;
 
     //condition of sort, field and order ascending, descending
-    const sorting: { sortField: string; sortOrder: number } = sort(
-      sortField,
+    const sorting: { sortBy: Field; sortOrder: Order } = sort({
+      sortBy,
       sortOrder,
-    );
+    });
+
     //Pagination
     const pagin: { page: number; perPage: number } = pagination(page, perPage);
     // filter Filters
+    filters['userId'] = userId;
     filters = isEmptyObj(filters);
+
+    console.log(filters);
 
     // run repository
     const data = { pagin, sorting, filters };

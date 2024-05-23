@@ -26,7 +26,7 @@ import { Request } from 'express';
 import { ApiErrorDecorator } from 'src/utils/common/decorators/error/error.decorator';
 import { AssigneeDto } from '../dto/assignee-task.dto';
 import { Task } from 'src/project/entities/project.entities';
-import { Field, Order } from 'src/project/enum/sort-enum';
+import { Sorting } from 'src/project/interface/queryFindAllProjects-interface';
 
 @ApiBearerAuth()
 @ApiTags('tasks')
@@ -49,7 +49,7 @@ export class TasksController {
   async create(
     @Body() createTaskDto: CreateTaskDto,
     @Param('projectId') projectId: string,
-  ): Promise<CommonResponse<Task>> {
+  ): Promise<CommonResponse<{ task: Task }>> {
     //run service
     const result = await this.tasksService.create(createTaskDto, projectId);
     //response
@@ -65,9 +65,9 @@ export class TasksController {
   })
   async findAll(
     @Param('projectId') projectId: string,
-    @Query() sort: { sortField?: Field; sortOrder: Order },
+    @Query() sort: Sorting,
     @Req() req: Request,
-  ): Promise<CommonResponse<Task[]>> {
+  ): Promise<CommonResponse<{ tasks: Task[] | [] }>> {
     //run service
     const userId = req.user['id'];
     const result = await this.tasksService.findAll({ sort, projectId, userId });
@@ -85,7 +85,7 @@ export class TasksController {
   async findOne(
     @Param() param: { projectId: string; taskId: string },
     @Req() req: Request,
-  ): Promise<CommonResponse<Task>> {
+  ): Promise<CommonResponse<{ task: Task }>> {
     //run services
     const userId = req.user['id'];
     const result = await this.tasksService.findOne({ ...param, userId });
@@ -103,7 +103,7 @@ export class TasksController {
   async update(
     @Body() updateTaskDto: UpdateTaskDto,
     @Param() params: { taskId: string; projectId: string },
-  ): Promise<CommonResponse<Task>> {
+  ): Promise<CommonResponse<{ task: Task }>> {
     const { taskId, projectId } = params;
     //run services
     const result = await this.tasksService.update(

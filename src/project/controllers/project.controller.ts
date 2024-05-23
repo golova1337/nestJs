@@ -33,7 +33,7 @@ import { Status } from '../enum/status-enum';
 import { RemoveDto } from '../dto/remove-project.dto';
 import { Project } from '../entities/project.entities';
 import { Field, Order } from '../enum/sort-enum';
-import { FindAllProject } from '../interface/queryFindAllProjects-interface';
+import { QueryFindAllProjects } from '../interface/queryFindAllProjects-interface';
 import { PerPage } from '../enum/perPage-enum';
 
 @ApiBearerAuth()
@@ -61,7 +61,7 @@ export class ProjectController {
   async create(
     @Body() createProjectDto: CreateProjectDto,
     @Req() req: Request,
-  ): Promise<CommonResponse<Project>> {
+  ): Promise<CommonResponse<{ project: Project }>> {
     const userId = req.user['id'];
 
     // run service
@@ -106,11 +106,16 @@ export class ProjectController {
     description: 'defualt asc',
     required: false,
   })
+  @ApiQuery({ name: 'title', type: 'string', required: false })
   @ApiCreatedResponse({ type: CommonResponse, status: 200 })
   async findAll(
     @Req() req: Request,
-    @Query() query: FindAllProject,
-  ): Promise<CommonResponse<Project[]>> {
+    @Query() query: QueryFindAllProjects,
+  ): Promise<
+    CommonResponse<{
+      projects: Project[] | [];
+    }>
+  > {
     // get condition
     const userId: string = req.user['id'];
 
@@ -134,7 +139,7 @@ export class ProjectController {
   async findOne(
     @Param('projectId') projectId: string,
     @Req() req: Request,
-  ): Promise<CommonResponse<Project>> {
+  ): Promise<CommonResponse<{ project: Project }>> {
     const userId = req.user['id'];
 
     // run service
@@ -158,7 +163,7 @@ export class ProjectController {
     @Req() req: Request,
     @Param('projectId') id: string,
     @Body() updateProjectDto: UpdateProjectDto,
-  ): Promise<CommonResponse<Project>> {
+  ): Promise<CommonResponse<{ project: Project }>> {
     const userId = req.user['id'];
     //run service
     const result = await this.projectService.update(

@@ -1,7 +1,12 @@
 import { CommonResponse } from '../types/response-type';
 
+type Result<T> = {
+  data: T;
+  meta?: object;
+};
+
 export class Response {
-  static succsessfully(result): CommonResponse<any> {
+  static succsessfully<T>(result: Result<T>): CommonResponse<T> {
     return {
       status: true,
       error: false,

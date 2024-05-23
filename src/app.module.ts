@@ -13,6 +13,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { TasksModule } from './tasks/tasks.module';
 import { BullModule } from '@nestjs/bull';
 import { SeedModule } from './seed/seed.module';
+import { EmojiLogger } from './utils/logger/LoggerService';
 
 @Module({
   imports: [

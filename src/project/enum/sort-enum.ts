@@ -1,5 +1,5 @@
 export enum Field {
-  createdAT = 'createdAT',
+  createdAt = 'createdAT',
   updatedAt = 'updatedAt',
 }
 

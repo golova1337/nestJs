@@ -13,8 +13,8 @@ export class TokenInfo {
 
   @Prop({
     type: Date,
-    default: Date.now() + Time.seven, // seven day
-    expires: Time.seven, // seven day
+    default: Date.now() + Time.sevenDays,
+    expires: Time.sevenDays,
   })
   expiresAt: Date;
 }

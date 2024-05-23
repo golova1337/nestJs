@@ -23,8 +23,8 @@ export class Invitation {
   token: string;
   @Prop({
     type: Date,
-    expires: Time.seven,
-    default: Date.now() + Time.seven,
+    expires: Time.sevenDays,
+    default: Date.now() + Time.sevenDays,
   })
   expireAt: Date;
 }

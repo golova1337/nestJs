@@ -96,7 +96,7 @@ export class ProjectSettingsController {
   async gainAccess(
     @Param('projectId') projectId: string,
     @Query('token') token: string,
-  ): Promise<CommonResponse<{ title: string }>> {
+  ): Promise<CommonResponse<{ project: string }>> {
     // run service
 
     const result = await this.settingsProjectService.gainAccess({
